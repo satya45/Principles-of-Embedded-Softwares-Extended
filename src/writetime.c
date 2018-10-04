@@ -1,20 +1,13 @@
-/**
-* @brief  Generation of Pseudo Random number
-*user specifies word, seed and memory location
-*pseudo random pattern is generated in the memory location specified by user
-* @author Satya Mehta and Siddhant Jajoo
-*/
-
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#include "writetime.h"
-#include "allocate.h"
-#include "specifymem.h"
+#include "../inc/writetime.h"
+#include "../inc/allocate.h"
+#include "../inc/specifymem.h"
 
-/*writetime function*/
+
 	
 void writetime()
 {
@@ -33,8 +26,6 @@ specifymem();
 printf("\nEnter the number of words\n");
 scanf("%d", &word);
 
-
-/*Generation of Random number*/
 for (int j=0;j<word;j++)
 {
 

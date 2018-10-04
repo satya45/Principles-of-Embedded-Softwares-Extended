@@ -1,22 +1,11 @@
-/**
-* @brief  
-*Verifies a pseudo random pattern gnerated in inverttime
-*
-* @author Satya Mehta and Siddhant Jajoo
-*/
-
-
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
-#include "verifytime.h"
-#include "writetime.h"
-#include "allocate.h"
-#include "specifymem.h"
-
-
-/*Verify pseudo function*/
+#include "../inc/verifytime.h"
+#include "../inc/writetime.h"
+#include "../inc/allocate.h"
+#include "../inc/specifymem.h"
 
 void verifytime()
 {
@@ -36,7 +25,6 @@ scanf("%d", &word);
 for (int j=0;j<word;j++)
 {
 
-/*Take seed value*/
 if (one_time1==0)
 {
 printf("\nEnter the seed value\n");
@@ -48,7 +36,6 @@ __uint32_t Q = prime / seed1;
 
 __uint32_t R=  prime % seed1;
 
-/*Generate random number*/
 ran_number1 = (seed1 * (ran_number1 % Q)) - (R * floor(ran_number1/Q));
 
 if (ran_number1<0) 
@@ -60,8 +47,6 @@ ran_number1 = (ran_number1 * seed1) % prime;
 
 
 (new_ptr)=(new_ptr) + (j*1);
-
-/*Verification of pseudo random pattern*/
  
 if (*new_ptr==ran_number1)
 {

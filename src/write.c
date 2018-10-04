@@ -1,17 +1,10 @@
-/**
-* @brief Writes data in a memory block
-*user specifies offset, memory address where the user defined data is written.
-*
-* @author Satya Mehta and Siddhant Jajoo
-*/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "allocate.h" 
-#include "write.h"
-#include "specifymem.h"
+#include "../inc/allocate.h" 
+#include "../inc/write.h"
+#include "../inc/specifymem.h"
 
 
 void write()
@@ -24,7 +17,6 @@ specifymem();
 	printf("\nEnter the number of words to be written\n");
 	scanf("%d", &word);
 
-/* Take input data*/
 	for (int j=0;j<word;j++)
 	{
 

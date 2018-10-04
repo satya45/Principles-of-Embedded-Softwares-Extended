@@ -1,20 +1,13 @@
-/**
-* @brief  Inverts data inside a memory 
-*User spcifies a location whose data is to be inverted.
-*
-* @author Satya Mehta and Siddhant Jajoo
-*/
-
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#include "inverttime.h"
-#include "writetime.h"
-#include "allocate.h"
-#include "specifymem.h"
+#include "../inc/inverttime.h"
+#include "../inc/writetime.h"
+#include "../inc/allocate.h"
+#include "../inc/specifymem.h"
 
-/*Inverttime function*/
+
 
 void inverttime()
 {
@@ -23,7 +16,7 @@ __uint32_t word;
 char input_data[32];
 
 clock_t start = clock();
-specifymem(); //user specifies a memory
+specifymem();
 
 printf("\nEnter the number of words to be inverted\n");
 scanf("%d", &word);
@@ -31,7 +24,7 @@ scanf("%d", &word);
 for (int j=0;j<word;j++)
 {
 (new_ptr)=(new_ptr) + (j*1);
-(*new_ptr) = (*new_ptr) ^ (invert); //inverting data
+(*new_ptr) = (*new_ptr) ^ (invert);
 
 
 //(*new_ptr)=ran_number;
