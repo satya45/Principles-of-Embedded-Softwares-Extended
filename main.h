@@ -10,7 +10,7 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Function declarations and global variables declaration
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +18,21 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+#ifndef MAIN_H
+#define MAIN_H main.h
 
 
-#include<stdio.h>
+#include <stdio.h>
 
-void h(void);
+typedef struct
+{
+char *cmd;
+void (*myfunct)();
+
+}table;
+ 
+
+void ex(void);
+__uint32_t e =1;
+
 #endif

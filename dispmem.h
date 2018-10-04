@@ -10,7 +10,10 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Header files to display memory contents
+*
+* 
+*
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +21,10 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
 
+#ifndef DISPMEM_H
+#define DISPMEM_H dispmem.h
 
-#include<stdio.h>
-
-void h(void);
+void dispmem(void);
+void pass(char*,int);
 #endif

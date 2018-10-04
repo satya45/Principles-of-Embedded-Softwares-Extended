@@ -10,7 +10,7 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Header file of verifytime which verifies the psuedo random pattern generated.
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +18,14 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+#ifndef VERIFYTIME_H
+#define VERIFYTIME_H verifytime.h
 
 
-#include<stdio.h>
+__uint32_t ran_number1;
+__uint32_t seed1;
+int one_time1; 
 
-void h(void);
-#endif
+void verifytime(void);
+
+#endif 

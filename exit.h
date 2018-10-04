@@ -10,7 +10,8 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief EXIT function declaration to exit the program.
+*
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +19,12 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+#ifndef EXIT_H
+#define EXIT_H exit.h
 
 
-#include<stdio.h>
+#include <stdio.h>
 
-void h(void);
+void ex(void);
+
 #endif

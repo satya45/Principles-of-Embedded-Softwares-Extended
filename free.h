@@ -10,7 +10,7 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Header file of free to free up the allocated memory block
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +18,13 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
 
 
-#include<stdio.h>
 
-void h(void);
+#ifndef FREE_H 
+#define FREE_H free.h
+
+
+
+void fr(void);
 #endif

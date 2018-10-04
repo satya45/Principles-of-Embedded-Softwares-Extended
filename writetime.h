@@ -10,7 +10,7 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Writes a psuedo random pattern in a user specified memory using a seed value.
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +18,18 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
 
+#ifndef WRITETIME_H
+#define WRITETIME_H writetime.h
 
-#include<stdio.h>
+#include <stdio.h>
+#include <time.h>
 
-void h(void);
+__uint32_t prime;
+__uint32_t ran_number;
+__uint32_t seed;
+int one_time; 
+
+void writetime(void);
+
 #endif

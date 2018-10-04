@@ -10,7 +10,10 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief An abstraction for memory read and write operations
+*
+* This header file provides an abstraction of allocating the memory.
+*
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +21,16 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+#ifndef ALLOCATE_H
+#define ALLOCATE_H allocate.h
 
 
-#include<stdio.h>
+#include <stdio.h>
+int *ptr;
+int *last_ptr;
+//int *mem = *ptr;
+int i;
+int max_word;
+void allocate(void);
 
-void h(void);
 #endif

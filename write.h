@@ -10,7 +10,8 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Write header file
+* This function writes the user specified data into a user specified memory.
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +19,12 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+#ifndef WRITE_H 
+#define WRITE_H write.h
 
 
-#include<stdio.h>
+void write(void);
 
-void h(void);
-#endif
+
+
+#endif  

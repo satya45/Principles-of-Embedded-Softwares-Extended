@@ -10,7 +10,7 @@
 *****************************************************************************/
 /**
 * @file allocate.h
-* @brief HELP command header file. Display's all the available commands in the example.
+* @brief Header file of inverting a user specified memory 
 * @author Satya Mehta, Siddhant Jajoo
 * @date October 3 2018
 * @version 1.0
@@ -18,11 +18,14 @@
 */
 
 
-#ifndef HELP_H
-#define HELP_H help.h
+
+#ifndef INVERTTIME_H
+#define INVERTTIME_H inverttime.h
+
+#define invert 0xFFFFFFFF
 
 
-#include<stdio.h>
+void inverttime(void);
 
-void h(void);
+
 #endif
