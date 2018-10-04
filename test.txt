@@ -1,5 +1,6 @@
 help
 allocate
+3
 write
 N
 2
