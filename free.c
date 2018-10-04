@@ -1,3 +1,11 @@
+/**
+* @brief  Free up a memory block
+*Pointer is passed in a free function to free up the memory block
+*
+* @author Satya Mehta and Siddhant Jajoo
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "free.h"

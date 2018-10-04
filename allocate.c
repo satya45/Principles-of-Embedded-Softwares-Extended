@@ -16,7 +16,7 @@
 
 
 char *p_tr;
-
+/* allocate function*/
 void allocate()
 {
 printf("Enter number of 32 bit words\n");
@@ -26,6 +26,7 @@ ptr= malloc(i);
 
 last_ptr=ptr + max_word;
 
+/*check the pointer to see whether the memory block can be allocated or not*/
 if (ptr==NULL)
 {
 printf("\nCan't allocate memory\n");
