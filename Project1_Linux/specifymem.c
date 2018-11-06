@@ -1,11 +1,17 @@
+/**
+* @brief  Function which takes user input for a memory or a offset
+*
+* @author Satya Mehta and Siddhant Jajoo
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <math.h>
 
-#include "../inc/specifymem.h"
-#include "../inc/allocate.h"
+#include "specifymem.h"
+#include "allocate.h"
 
 
 void specifymem()
@@ -15,7 +21,7 @@ char mem[13];
 char m;
 __uint32_t o;
 
-
+/*Memory adress inputs*/
 printf("Press M to specify memory location or N to specify offset\n");
 again:
 scanf(" %c", &m);
@@ -38,6 +44,9 @@ new_ptr= (__uint32_t*)input_memloc;
 printf("\nThe Memory address accessed is:%p\n",new_ptr);
 	
 }
+
+
+/*For offset input*/
 else if (m=='N')	
 {
 printf("\nEnter the offset\n");

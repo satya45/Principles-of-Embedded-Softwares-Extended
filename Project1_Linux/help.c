@@ -1,6 +1,15 @@
-#include<stdio.h>
-#include"../inc/help.h"
+/**
+* @brief  Allocates a memory block
+*invokes a help function which display's all the available commands
+*
+* @author Satya Mehta and Siddhant Jajoo
+*/
 
+
+#include<stdio.h>
+#include"help.h"
+
+/*Help function*/
 void h()
 {
 

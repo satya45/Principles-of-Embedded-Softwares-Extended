@@ -1,20 +1,31 @@
+/**
+* @brief  Main Function
+*Lookup table implemented. Commands called in while loop.
+*
+* @author Satya Mehta and Siddhant Jajoo
+*/
+
+
 #include <stdio.h>
 #include <string.h>
-#include "../inc/help.h"
-#include "../inc/main.h"
-#include "../inc/allocate.h"
-#include "../inc/dispmem.h"
-#include "../inc/free.h"
-#include "../inc/write.h"
-#include "../inc/writetime.h"
-#include "../inc/inverttime.h"
-#include "../inc/verifytime.h"
+#include "help.h"
+#include "main.h"
+#include "allocate.h"
+#include "dispmem.h"
+#include "free.h"
+#include "write.h"
+#include "writetime.h"
+#include "inverttime.h"
+#include "verifytime.h"
 
 
 char input[20];
 int one_time=0;
 int one_time1=0;
-__uint32_t prime=104473;	
+__uint32_t prime=104473;
+
+
+//lookup table array	
 table lookup[]=
 {
 
