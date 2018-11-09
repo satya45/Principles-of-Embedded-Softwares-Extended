@@ -68,7 +68,7 @@ int main (void)
     // Print the initial banner
     printf("\r\nHello World!\r\n\r\n");
 
-    circbuff *SMA = circbuff_init(elements);
+    circbuff *SMA = circbuff_init(ELEMENTS);
 
     printf("Size of Structure : %d\r\n", sizeof(circbuff));
     printf("Starting Memory Address : %x\r\n", SMA);

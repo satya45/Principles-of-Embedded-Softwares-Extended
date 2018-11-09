@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 #define KDS
-#define elements		(2)
+#define ELEMENTS		(2)
 
 #ifdef KDS
 #define printf PRINTF
@@ -20,7 +20,7 @@
 // RX buffers
 //! @param receiveBuff Buffer used to hold received data
 uint8_t receiveBuff;
-int8_t cb[elements];
+int8_t cb[ELEMENTS];
 volatile uint16_t count;
 
 #endif /* MAIN_H_ */
