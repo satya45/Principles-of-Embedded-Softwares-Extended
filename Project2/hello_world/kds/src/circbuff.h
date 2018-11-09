@@ -21,7 +21,6 @@
 typedef struct{
 
 	int8_t *buffer;
-	int8_t data;
 	int16_t head;
 	int16_t tail;
 	int16_t length;
@@ -30,20 +29,12 @@ typedef struct{
 }circbuff;
 
 
-#define buffinit(x,y) int bufflen[y+1];\
-		circbuff x= {\
-				.buffer=bufflen,\
-				.head=0,\
-				.tail=0,\
-				.length=y+1\
-};
-
-
 void push(circbuff *circ_b, int8_t data_byte);
 void pop(circbuff *circ_b);
 void circbuff_reset(circbuff *circ_b);
 circbuff *circbuff_init (int16_t length);
 void circbuff_free(circbuff *circ_b);
 bool buffer_status(circbuff *circ_b);
+uint16_t buffer_size(circbuff *circ_b);
 
 #endif /* SRC_CIRCBUFF_H_ */

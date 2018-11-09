@@ -21,6 +21,6 @@
 //! @param receiveBuff Buffer used to hold received data
 uint8_t receiveBuff;
 int8_t cb[elements];
-uint16_t count;
+volatile uint16_t count;
 
 #endif /* MAIN_H_ */

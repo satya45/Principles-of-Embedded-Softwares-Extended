@@ -42,20 +42,14 @@
 
 #ifdef KDS
 #include "board.h"
-#include "fsl_lptmr_driver.h"
 #include "fsl_debug_console.h"
-#include "lptmr.h"
 #endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
 ////////////////////////////////////////////////////////////////////////////////
-// Timer period: 500000uS
-//#define TMR_PERIOD         500000U
-//#if defined(TWR_KV46F150M)
-//#define LPTMR0_IDX LPTMR_IDX
-//#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -67,54 +61,36 @@
 int main (void)
 {
 	// Initialize standard SDK demo application pins
-	//hardware_init();
+	hardware_init();
 
 	count = 0;
-
-	/*Configure lptmr*/
-    lptmr_config();
-
-    // Initialize LED1
-    LED1_EN;
 
     // Print the initial banner
     printf("\r\nHello World!\r\n\r\n");
 
     circbuff *SMA = circbuff_init(elements);
 
-    printf("Size of Structure %d\r\n", sizeof(circbuff));
-    printf("Starting Memory Address %x\r\n", SMA);
-
-    printf("Starting Buffer Memory Address %x\r\n", SMA->buffer);
-    printf("Length %d\r\n", SMA->length);
-    printf("Head %d\r\n", SMA->head);
-    printf("Tail %d\r\n", SMA->tail);
-    printf("Full Status %d\r\n", SMA->full_status);
-    printf("Data %d\r\n", SMA->data);
-
+    printf("Size of Structure : %d\r\n", sizeof(circbuff));
+    printf("Starting Memory Address : %x\r\n", SMA);
+    printf("Starting Buffer Memory Address : %x\r\n", SMA->buffer);
+    printf("Length : %d\r\n", SMA->length);
+    printf("Head : %d\r\n", SMA->head);
+    printf("Tail : %d\r\n", SMA->tail);
+    printf("Full Status : %d\r\n", SMA->full_status);
 
     push(SMA,1);
     push(SMA,2);
+    push(SMA,3);
 
-    printf("******************************");
+    printf("******************************\r\n");
 
     pop(SMA);
     pop(SMA);
+    pop(SMA);
 
-    //circbuff_free(SMA);
+    push(SMA,10);
+    circbuff_free(SMA);
 
-    /*
-    buffinit(my_circ_buff, 32);
-	int in_data=23;
-
-	if (push(&my_circ_buff, in_data))
-	{
-		printf("Out of space in CB\r\n");
-	}
-	circbuff *i= &my_circ_buff;
-	printf("Push:%d\r\n", in_data);
-	printf("Data in First Loacation=%d\r\n", i->buffer[0]);
-    */
     while(1)
     {
         // Main routine that simply echoes received characters forever

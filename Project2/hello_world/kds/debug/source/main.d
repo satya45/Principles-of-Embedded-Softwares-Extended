@@ -18,12 +18,7 @@ source/main.o: \
  ../../../../../../platform/hal/inc/fsl_gpio_hal.h \
  ../../../../../../platform/utilities/inc/fsl_debug_console.h \
  ../../../../../../platform/osa/inc/fsl_os_abstraction.h \
- ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h \
- ../../../../../../platform/drivers/inc/fsl_lptmr_driver.h \
- ../../../../../../platform/hal/inc/fsl_lptmr_hal.h \
- ../../../../../../platform/hal/inc/fsl_sim_hal.h \
- c:\freescale\ksdk_1.3.0\platform\hal\src\sim\mkl25z4\fsl_sim_hal_mkl25z4.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/lptmr.h
+ ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/main.h:
 
@@ -66,13 +61,3 @@ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/circbuf
 ../../../../../../platform/osa/inc/fsl_os_abstraction.h:
 
 ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h:
-
-../../../../../../platform/drivers/inc/fsl_lptmr_driver.h:
-
-../../../../../../platform/hal/inc/fsl_lptmr_hal.h:
-
-../../../../../../platform/hal/inc/fsl_sim_hal.h:
-
-c:\freescale\ksdk_1.3.0\platform\hal\src\sim\mkl25z4\fsl_sim_hal_mkl25z4.h:
-
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/lptmr.h:
