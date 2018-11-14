@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/circbuff.c 
+../src/circbuff.c \
+../src/uart.c 
 
 OBJS += \
-./src/circbuff.o 
+./src/circbuff.o \
+./src/uart.o 
 
 C_DEPS += \
-./src/circbuff.d 
+./src/circbuff.d \
+./src/uart.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -11,10 +11,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "main.h"
 
 #ifdef KDS
 #include "board.h"
 #include "fsl_debug_console.h"
+#else
+#include <stdio.h>
 #endif
 
 
