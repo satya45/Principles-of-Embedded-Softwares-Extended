@@ -11,6 +11,7 @@
 
 #include "main.h"
 #include "circbuff.h"
+#include "uart.h"
 
 
 /*Inserts an element in the Circular buffer*/
@@ -36,7 +37,7 @@ void push(circbuff *circ_b, int8_t data_byte)
 }
 
 /*Reads the oldest element from the circular buffer*/
-void pop(circbuff *circ_b)
+int8_t pop(circbuff *circ_b)
 {
 	if (!buffer_status(circ_b))
 	{
@@ -52,6 +53,7 @@ void pop(circbuff *circ_b)
 		printf ("Value read at position %d is %d\r\n", circ_b->tail, circ_b->buffer[circ_b->tail]);
 		circ_b->tail = (circ_b->tail + 1) % ELEMENTS;
 		count--;
+		return (circ_b->buffer[circ_b->tail]);
 	}
 }
 
@@ -68,7 +70,7 @@ circbuff * circbuff_init (int16_t length)
 //	circbuff * my_circ_buff = (circbuff *) malloc(length + sizeof(circbuff));
 	//	my_circ_buff->buffer  = (int8_t *)my_circ_buff + 1 ;
 	//	my_circ_buff->buffer  = cb;
-	circbuff * my_circ_buff = (circbuff *) malloc(sizeof(circbuff));
+	circbuff *my_circ_buff = (circbuff *) malloc(sizeof(circbuff));
 	my_circ_buff->buffer = (int8_t *)malloc (length);
 	my_circ_buff->length = length;
 	circbuff_reset(my_circ_buff);
@@ -105,3 +107,29 @@ uint16_t buffer_size(circbuff *circ_b)
 {
 	return(count);
 }
+
+/*
+void resize_buffer(int8_t size)
+{
+	if (size == 27)
+	{
+		uint8_t i =0;
+		uint8_t z[5] ={0};
+		myprintf(" enter the buffer size that you want\r\n");
+		do
+		{
+			z[i] = uart_rx();
+			uart_tx(z[i]);
+			i++;
+		}
+		while (z[i-1]!= 13);
+
+		myprintf("Check Values\r\n");
+		input_size = atoi(z);
+		printf("\r\n%d", input_size);
+		//			input_size = uart_rx();
+//			i++;
+
+	}
+}
+*/

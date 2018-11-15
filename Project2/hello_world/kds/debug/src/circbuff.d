@@ -15,7 +15,8 @@ src/circbuff.o: ../src/circbuff.c ../src/main.h ../src/circbuff.h \
  ../../../../../../platform/hal/inc/fsl_gpio_hal.h \
  ../../../../../../platform/utilities/inc/fsl_debug_console.h \
  ../../../../../../platform/osa/inc/fsl_os_abstraction.h \
- ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h
+ ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h ../src/uart.h \
+ ../../../../../../platform/devices/MKL25Z4/include/MKL25Z4.h
 
 ../src/main.h:
 
@@ -58,3 +59,7 @@ src/circbuff.o: ../src/circbuff.c ../src/main.h ../src/circbuff.h \
 ../../../../../../platform/osa/inc/fsl_os_abstraction.h:
 
 ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h:
+
+../src/uart.h:
+
+../../../../../../platform/devices/MKL25Z4/include/MKL25Z4.h:

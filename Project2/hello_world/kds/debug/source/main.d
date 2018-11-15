@@ -21,7 +21,8 @@ source/main.o: \
  ../../../../../../platform/osa/inc/fsl_os_abstraction.h \
  ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h \
  C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/uart.h \
- ../../../../../../platform/devices/MKL25Z4/include/MKL25Z4.h
+ ../../../../../../platform/devices/MKL25Z4/include/MKL25Z4.h \
+ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/circbuff.h
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/main.h:
 
@@ -70,3 +71,5 @@ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/main.h:
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/uart.h:
 
 ../../../../../../platform/devices/MKL25Z4/include/MKL25Z4.h:
+
+C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\demo_apps\hello_world\kds\src/circbuff.h:

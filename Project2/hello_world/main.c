@@ -90,35 +90,7 @@
 						 {241,0},{242,0},{243,0},{244,0},{245,0},{246,0},{247,0},{248,0},{249,0},{250,0},
 						 {251,0},{252,0},{253,0},{254,0},{255,0}
 				 };
-/*
-void disp_count()
-{
-	uint16_t number = lookup[i].char_count;
-	uint16_t divisor_check = number;
-	uint16_t divisor = 0;
-	int8_t power = -1;
-	uint8_t send_count = 0;
 
-	while (divisor_check!=0)
-	{
-		divisor_check = divisor_check/10;
-		power++;
-	}
-
-	divisor = pow(10,power);
-
-	while (number!=0)
-	{
-		send_count = number/divisor;
-		number = number - send_count*divisor;
-		divisor = divisor/10;
-		// Convert to ASCII value
-		send_count = send_count + 48;
-		uart_tx(send_count);
-		// printf("%d\r\n",send_count);
-	}
-}
-*/
 // * @brief Main function
 
 int main (void)
@@ -128,88 +100,34 @@ int main (void)
 	hardware_init();
 #endif
 	count = 0;
+	a= 0;
 	uart_init();
     // Print the initial banner
-    printf("\r\nHello World!\r\n\r\n");
+    myprintf("\r\nHello World!\r\n\r\n");
 
-    circbuff *SMA = circbuff_init(ELEMENTS);
-
-    printf("Size of Structure : %d\r\n", sizeof(circbuff));
-    printf("Starting Memory Address : %x\r\n", SMA);
-    printf("Starting Buffer Memory Address : %x\r\n", SMA->buffer);
-    printf("Length : %d\r\n", SMA->length);
-    printf("Head : %d\r\n", SMA->head);
-    printf("Tail : %d\r\n", SMA->tail);
-    printf("Full Status : %d\r\n", SMA->full_status);
-
-    push(SMA,1);
-    push(SMA,2);
-    push(SMA,3);
-
-    printf("******************************\r\n");
-
-    pop(SMA);
-    pop(SMA);
-    pop(SMA);
-
-    push(SMA,10);
-    circbuff_free(SMA);
-    (lookup[65].char_count)++;
-
-    for (uint8_t i=66;i<68;i++)
-    {
-    	printf("%c = %d\r\n",lookup[i].char_ascii_value,lookup[i].char_count);
-    }
-
-    printf("%c and %d\r\n" , lookup[65].char_ascii_value,lookup[65].char_ascii_value);
-    printf("%c and %d\r\n" , lookup[66].char_ascii_value,lookup[66].char_ascii_value);
-
+    SMA = circbuff_init(ELEMENTS);
+//    circbuff_free(SMA);
 
     while(1)
     {
-
-
-    	int8_t a = uart_rx();
-
+    	a = uart_rx();
     	uart_tx(a);
-    	//uart_tx(13);
 
     	for (int i=0; i<sizeof(lookup)/sizeof(lookup[0]); i++)
     	{
     		if (a==lookup[i].char_ascii_value)
     		{
-//    			printf("\r\n%c\r\n",i);
-//    			printf("\r\n%d\r\n",i);
+    			(lookup[i].char_count)++;
 
-    			(lookup[i].char_count) = 234;
 
-//    			printf("%d",lookup[i].char_ascii_value);
-//    			printf("%d",lookup[i].char_count);
-
+    			myprintf("\r\n*REPORT*\r\n");
     			//********************************************************//
-    			uint16_t number = lookup[i].char_count;
-    			uint16_t divisor_check = number;
-    			uint16_t divisor = 0;
-    			int8_t power = -1;
-    			uint8_t send_count = 0;
-
-    			while (divisor_check!=0)
+    			for (int i=0; i<sizeof(lookup)/sizeof(lookup[0]); i++)
     			{
-    				divisor_check = divisor_check/10;
-    				power++;
-    			}
-
-    			divisor = pow(10,power);
-
-    			while (number!=0)
-    			{
-    				send_count = number/divisor;
-    				number = number - send_count*divisor;
-    				divisor = divisor/10;
-    				// Convert to ASCII value
-    				send_count = send_count + 48;
-    				uart_tx(send_count);
-    				// printf("%d\r\n",send_count);
+    				if (lookup[i].char_count != 0)
+    				{
+    					myprintf(" \r\n%c=%d \r\n", lookup[i].char_ascii_value, lookup[i].char_count);
+    				}
     			}
     		}
     	}

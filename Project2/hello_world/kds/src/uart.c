@@ -1,13 +1,19 @@
-#include "MKL25Z4.h"
-#include "uart.h"
+
 #include <stdint.h>
-#include "board.h"
 #include <stdlib.h>
+#include <math.h>
+
+#include "MKL25Z4.h"
+#include "board.h"
+#include "uart.h"
+#include "circbuff.h"
 
 
 #define OSR_VAL (16)
 #define SYS_CLOCK (48000000)
 #define BAUD (115200)
+
+
 void uart_init()
 {
 
@@ -54,7 +60,7 @@ void uart_init()
 
 
 
-void uart_tx(uint8_t data)
+void uart_tx(int8_t data)
 {
 
 	while(!(UART0->S1 & UART_S1_TDRE_MASK)); //Waiting for the buffer to get empty
@@ -63,16 +69,15 @@ void uart_tx(uint8_t data)
 
 }
 
-uint8_t uart_rx()
+int8_t uart_rx()
 {
 	uint8_t data;
 	while((UART0->S1 & UART_S1_RDRF_MASK) == 0);
-	data= UART0->D;
+	data = UART0->D;
+	push(SMA,data);
 	return data;
-
-
-
 }
+
 void UART0_IRQHandler()
 {
 __disable_irq();
@@ -87,3 +92,111 @@ int status;
 
  __enable_irq();
 }
+
+/*
+void myscanf(char * str,...)
+{
+va_list bp;
+va_start (bp, str);
+int i = 0;
+int j = 0;
+int k = 0;
+char arr[100] = {0};
+while (str && str[i])
+{
+	if(str[i] == '%')
+		i++;
+	{
+		switch (str[i])
+		{
+		case 'c':
+			while(1)
+			{
+				arr[j] = uart_rx();
+				uart_tx(arr[j]);
+				j++;
+				if (arr[j-1] == 13)
+				{
+					arr[j] = NULL;
+					uart_tx(10);
+					break;
+				}
+
+			}
+			*(char*)va_arg(bp,char*) = arr;
+			i++;
+			break;
+		}
+	}
+}
+va_end(bp);
+}
+*/
+
+void myprintf(char *str, ...)
+{
+	va_list ap;
+	va_start (ap, str);
+	int i = 0;
+
+	while (str && str[i])
+	{
+		uart_tx(str[i]);
+		i++;
+
+		if(str[i] == '%')
+		{
+			i++;
+
+			switch (str[i])
+			{
+			case 'd':
+
+				number = va_arg (ap,int);
+				divisor_check = number;
+				divisor = 0;
+				power = -1;
+				send_count = 0;
+
+				while (divisor_check!=0)
+				{
+					divisor_check = divisor_check/10;
+					power++;
+				}
+
+				divisor = pow(10,power);
+
+				while (divisor!=0)
+				{
+					send_count = number/divisor;
+					number = number - send_count*divisor;
+					divisor = divisor/10;
+					// Convert to ASCII value
+					send_count = send_count + 48;
+					uart_tx(send_count);
+				}
+				break;
+
+			case 'c':
+
+				uart_tx(va_arg (ap,int));
+
+				break;
+
+//
+//			case 's':
+//
+//				while (va_arg(ap,int)!=NULL)
+//				{
+//					uart_tx(va_arg(ap,int));
+//				}
+//				break;
+
+			}
+			i++;
+
+		}
+	}
+va_end(ap);
+}
+

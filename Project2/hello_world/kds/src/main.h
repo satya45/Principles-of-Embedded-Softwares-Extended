@@ -30,7 +30,7 @@ typedef struct
 uint8_t receiveBuff;
 int8_t cb[ELEMENTS];
 
+int8_t a;
 volatile uint16_t count;
-//void disp_count(void);
 
 #endif /* MAIN_H_ */
