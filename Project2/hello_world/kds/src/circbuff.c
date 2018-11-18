@@ -19,20 +19,19 @@ void push(circbuff *circ_b, int8_t data_byte)
 {
 	if (buffer_status(circ_b))
 	{
-		printf("Buffer is Full\r\n");
+		myprintf("Buffer is Full\r\n");
 	}
 	else
 	{
-		printf("Buffer is not full and Element can be inserted\r\n");
+//		myprintf("Buffer is not full and Element can be inserted\r\n");
 	}
 
 	if (count != ELEMENTS)
 	{
 		circ_b->buffer[circ_b->head] = data_byte;
-		printf ("Value inserted at position %d is %d\r\n", circ_b->head, circ_b->buffer[circ_b->head]);
+		//		myprintf ("Value inserted at position %d is %d\r\n", circ_b->head, circ_b->buffer[circ_b->head]);
 		circ_b->head = (circ_b->head + 1) % ELEMENTS;
 		count = (count % ELEMENTS) + 1;		//Denotes the number of elements in the Buffer
-		//	count = (count & ELEMENTS) + 1;
 	}
 }
 
@@ -41,20 +40,22 @@ int8_t pop(circbuff *circ_b)
 {
 	if (!buffer_status(circ_b))
 	{
-		printf("Buffer is Empty\r\n");
+//		myprintf("Buffer is Empty\r\n");
 	}
 	else
 	{
-		printf("Buffer contains elements and can be read\r\n");
+//		myprintf("Buffer contains elements and can be read\r\n");
 	}
 
 	if (count != 0)
 	{
-		printf ("Value read at position %d is %d\r\n", circ_b->tail, circ_b->buffer[circ_b->tail]);
+//		myprintf ("Value read at position %d is %d\r\n", circ_b->tail, circ_b->buffer[circ_b->tail]);
+		pop_value = circ_b->buffer[circ_b->tail];
 		circ_b->tail = (circ_b->tail + 1) % ELEMENTS;
 		count--;
-		return (circ_b->buffer[circ_b->tail]);
+		return (pop_value);
 	}
+	return -1;
 }
 
 /*Resets the Circular Buffer Parameters*/
@@ -67,9 +68,6 @@ void circbuff_reset(circbuff *circ_b)
 
 circbuff * circbuff_init (int16_t length)
 {
-//	circbuff * my_circ_buff = (circbuff *) malloc(length + sizeof(circbuff));
-	//	my_circ_buff->buffer  = (int8_t *)my_circ_buff + 1 ;
-	//	my_circ_buff->buffer  = cb;
 	circbuff *my_circ_buff = (circbuff *) malloc(sizeof(circbuff));
 	my_circ_buff->buffer = (int8_t *)malloc (length);
 	my_circ_buff->length = length;
@@ -83,7 +81,6 @@ void circbuff_free(circbuff *circ_b)
 {
 	free(circ_b);
 	circ_b = NULL;
-	printf("Starting Memory Address after FREE : %x\r\n", circ_b);
 }
 
 /*Gets the buffer Status if it is Empty or Full*/
@@ -115,7 +112,7 @@ void resize_buffer(int8_t size)
 	{
 		uint8_t i =0;
 		uint8_t z[5] ={0};
-		myprintf(" enter the buffer size that you want\r\n");
+		mymyprintf(" enter the buffer size that you want\r\n");
 		do
 		{
 			z[i] = uart_rx();
@@ -124,12 +121,12 @@ void resize_buffer(int8_t size)
 		}
 		while (z[i-1]!= 13);
 
-		myprintf("Check Values\r\n");
+		mymyprintf("Check Values\r\n");
 		input_size = atoi(z);
-		printf("\r\n%d", input_size);
+		myprintf("\r\n%d", input_size);
 		//			input_size = uart_rx();
 //			i++;
 
 	}
 }
-*/
+ */

@@ -39,7 +39,7 @@ all: hello_world_frdmkl25z.elf secondary-outputs
 hello_world_frdmkl25z.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross ARM C Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wall  -g -T ../../../../../../platform/devices/MKL25Z4/linker/gcc/MKL25Z128xxx4_flash.ld -Xlinker --gc-sections -Wl,-Map,"hello_world_frdmkl25z.map" -Xlinker -z  -Xlinker muldefs   --specs=nano.specs          -Wall  -fno-common  -ffunction-sections  -fdata-sections  -ffreestanding  -fno-builtin  -mapcs  -Xlinker -static  -Xlinker --defsym=__stack_size__=0x0400  -Xlinker --defsym=__heap_size__=0x0200 -o "hello_world_frdmkl25z.elf" -Xlinker --start-group $(OBJS) $(USER_OBJS) $(LIBS) -Xlinker --end-group
+	arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wall  -g -T ../../../../../../platform/devices/MKL25Z4/linker/gcc/MKL25Z128xxx4_flash.ld -Xlinker --gc-sections -Wl,-Map,"hello_world_frdmkl25z.map" -Xlinker -z  -Xlinker muldefs   --specs=nano.specs          -Wall  -fno-common  -ffunction-sections  -fdata-sections  -ffreestanding  -fno-builtin  -mapcs  -Xlinker -static  -Xlinker --defsym=__stack_size__=0x0C00  -Xlinker --defsym=__heap_size__=0x0200 -o "hello_world_frdmkl25z.elf" -Xlinker --start-group $(OBJS) $(USER_OBJS) $(LIBS) -Xlinker --end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

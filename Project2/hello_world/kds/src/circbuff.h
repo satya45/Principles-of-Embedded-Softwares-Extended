@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "main.h"
 
+
 #ifdef KDS
 #include "board.h"
 #include "fsl_debug_console.h"
@@ -31,7 +32,7 @@ typedef struct{
 
 }circbuff;
 
-
+int8_t pop_value;
 
 void push(circbuff *circ_b, int8_t data_byte);
 int8_t pop(circbuff *circ_b);
