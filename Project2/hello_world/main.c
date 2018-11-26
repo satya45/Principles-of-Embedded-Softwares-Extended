@@ -45,7 +45,7 @@
 
 #ifdef KDS
 #include "board.h"
-#include "fsl_debug_console.h"
+//#include "fsl_debug_console.h"
 #else
 #include <stdio.h>
 #endif
@@ -60,6 +60,33 @@
 // Code
 ////////////////////////////////////////////////////////////////////////////////
 
+void calc_prime(void);
+
+void calc_prime(void)
+{
+	int i, number, ct;
+	j=0;
+//	for(int j=0; j<10000000; j++);
+//	  myprintf(" Prime Numbers till %d: \r\n", total_char);
+	  for(number= 1; number <= total_char; number++)
+	  {
+	    ct = 0;
+	    for (i = 2; i <= number/2; i++)
+	    {
+	  	if(number%i == 0)
+	  	{
+	     	  ct++;
+	  	  break;
+		}
+	    }
+	    if(ct == 0 && number != 1 )
+	    {
+	    arr[j] = number;
+	    j++;
+//		printf(" %d \r\n", number);
+	    }
+	  }
+	}
 
 
 
@@ -72,22 +99,41 @@ int main (void)
 	hardware_init();
 #endif
 	count = 0;
+	resize_flag = 0;
+	total_char = 0;
+	input_size = 100;
 	uart_init();
     // Print the initial banner
     myprintf("\r\nHello World!\r\n\r\n");
-    LED2_EN;
-    SMA = circbuff_init(ELEMENTS); //initializing circular buffer
-
+//    LED2_EN;
+    SMA = circbuff_init(input_size); //initializing circular buffer
+//    resize_buffer();
 
     while(1)
     {
-
+//    	calc_prime();
+    	if (resize_flag == 1)
+    	{
+    		resize_buffer();
+    		resize_flag = 0;
+    		UART0_C2 |= UART0_C2_RIE_MASK;
+    	}
+    	else
+    	{
     	while (buffer_size(SMA)!=0)
     	{
+    		total_char++;
     		report(pop(SMA));
+//    		myprintf(" Prime Numbers till %d: \r\n", total_char);
+//    		for(int k = 0; k<j; k++)
+//    		{
+//    		printf(" %d \r\n", arr[k]);
+//    		}
     	}
-    	UART0_C2|=UART0_C2_TIE_MASK;
-    }
 
+
+//    	UART0_C2|=UART0_C2_RIE_MASK;
+    	}
+    }
 }
 

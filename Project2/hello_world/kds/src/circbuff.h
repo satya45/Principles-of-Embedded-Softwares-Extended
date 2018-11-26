@@ -33,7 +33,8 @@ typedef struct{
 }circbuff;
 
 int8_t pop_value;
-
+uint16_t input_size;
+circbuff *my_circ_buff;
 void push(circbuff *circ_b, int8_t data_byte);
 int8_t pop(circbuff *circ_b);
 void circbuff_reset(circbuff *circ_b);
@@ -41,6 +42,6 @@ circbuff *circbuff_init (int16_t length);
 void circbuff_free(circbuff *circ_b);
 bool buffer_status(circbuff *circ_b);
 uint16_t buffer_size(circbuff *circ_b);
-void resize_buffer(int8_t data);
+void resize_buffer(void);
 
 #endif /* SRC_CIRCBUFF_H_ */

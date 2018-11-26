@@ -10,6 +10,7 @@ uint16_t divisor_check;
 uint16_t divisor;
 int8_t power;
 uint8_t send_count;
+int8_t resize_flag;
 circbuff *SMA;
 
 volatile int8_t rx_data;

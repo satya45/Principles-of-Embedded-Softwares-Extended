@@ -2,9 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include "MKL25Z4.h"
-#include "board.h"
+//#include "board.h"
 #include "uart.h"
 #include "circbuff.h"
 #include "main.h"
@@ -12,7 +11,7 @@
 
 #define OSR_VAL (16)
 #define SYS_CLOCK (48000000)
-#define BAUD (4800)
+#define BAUD (115200)
 
 
 void uart_init()
@@ -84,7 +83,7 @@ void report(int8_t x)
 						myprintf(" \r\n%c=%d \r\n", lookup[i].char_ascii_value, lookup[i].char_count);
 					}
 				}
-
+				myprintf("Total Character = %d \r\n", total_char);
 			}
 		}
 	}
@@ -98,9 +97,19 @@ __disable_irq();
 
  if (UART0_S1 & UART_S1_RDRF_MASK)
  {
+//	 myprintf("Printing..");
 	 rx_data=UART0->D;
-	 push(SMA,rx_data);
-	 UART0_C2|=UART0_C2_TIE_MASK;
+	 if (rx_data == 27)
+	 {
+		 resize_flag = 1;
+		 UART0_C2 &=~ UART0_C2_RIE_MASK;
+
+	 }
+	 else
+	 {
+		 push(SMA,rx_data);
+		 UART0_C2|=UART0_C2_TIE_MASK;
+	 }
  }
  if (UART0_S1 & UART_S1_TDRE_MASK)
  {

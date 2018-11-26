@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 #define KDS			// Comment to run on linux Platform
-#define ELEMENTS		(50)
+#define ELEMENTS		(10)
 
 #ifdef KDS
 #define printf PRINTF
@@ -57,5 +57,9 @@ table lookup[]=
 //! @param receiveBuff Buffer used to hold received data
 
 volatile uint16_t count;
+volatile uint16_t total_char;
+uint16_t arr[50];
+int j = 0;
+
 
 #endif /* MAIN_H_ */
