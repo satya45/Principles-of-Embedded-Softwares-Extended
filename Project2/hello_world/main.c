@@ -109,7 +109,7 @@ int main (void)
 
     while(1)
     {
-    	calc_prime();
+//    	calc_prime();
 
     	if (resize_flag == 1)
     	{
@@ -142,6 +142,7 @@ int main (void)
     			myprintf("\r\n=>%c", rx_data);
     			report(rx_data);
     			myprintf(" Prime Numbers till %d: \r\n", total_char);
+    			calc_prime();
     			for(int k = 0; k<j; k++)
     			{
     				myprintf(" %d \r\n", arr[k]);
