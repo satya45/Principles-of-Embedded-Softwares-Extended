@@ -1,3 +1,5 @@
+-------------------------Bare Metal Firmware on FRDM KL25Z. PRINCIPLES OF EMBEDDED SOFTWARE PROJECT-2--------------------------------------
+
 
   The project covers circular buffer implementation with error handling stating if it is full or empty ,the ability to resize the buffer at any point of time, ability to return the number of elements in the buffer and also the ability to reset the buffer . The circular Buffer has been implemented in such a way that it does not reserve any unused byte of data when the buffer is full. Any number of buffers can be implemented by just using the circbuff_init function.
   
