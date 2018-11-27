@@ -55,6 +55,15 @@ void uart_tx(int8_t data)
 
 }
 
+void uart_tx_irq(int8_t data)
+{
+	UART0_C2|=(UART0_C2_TIE_MASK);
+	UART0->D = data;
+	while(!(UART0->S1 & UART_S1_TC_MASK)); //Waiting for transmission to get complete
+
+}
+
+
 int8_t uart_rx()
 {
 	int8_t data;
@@ -70,7 +79,7 @@ void report(int8_t x)
 	{
 		for (int i=32; i<128; i++)
 		{
-			if (x==lookup[i].char_ascii_value)
+			if (x==lookup[i].char_ascii_value)			//Comparing received value with lookup table
 			{
 				(lookup[i].char_count)++;
 				myprintf("\r\n*REPORT*\r\n");
@@ -97,32 +106,21 @@ __disable_irq();
 
  if (UART0_S1 & UART_S1_RDRF_MASK)
  {
-//	 myprintf("Printing..");
 	 rx_data=UART0->D;
-	 if (rx_data == 27)
-	 {
-		 resize_flag = 1;
-		 UART0_C2 &=~ UART0_C2_RIE_MASK;
-
-	 }
-	 else
-	 {
-		 push(SMA,rx_data);
-		 UART0_C2|=UART0_C2_TIE_MASK;
-	 }
+	 push(SMA,rx_data);
  }
+
  if (UART0_S1 & UART_S1_TDRE_MASK)
  {
-
-//	 UART0->D=rx_data;
-	 UART0_C2&=~UART0_C2_TIE_MASK;
+	 tx_flag = 1;						//Scheduler Flag
+	 UART0_C2&=~UART0_C2_TIE_MASK;		//Disabling Tx interrupts
  }
-
 
  __enable_irq();
 }
 
 
+/*Printf Function*/
 void myprintf(char *str, ...)
 {
 	va_list ap;
@@ -131,7 +129,7 @@ void myprintf(char *str, ...)
 
 	while (str && str[i])
 	{
-		uart_tx(str[i]);
+		uart_tx_irq(str[i]);
 		i++;
 
 		if(str[i] == '%')
@@ -163,13 +161,13 @@ void myprintf(char *str, ...)
 					divisor = divisor/10;
 					// Convert to ASCII value
 					send_count = send_count + 48;
-					uart_tx(send_count);
+					uart_tx_irq(send_count);
 				}
 				break;
 
 			case 'c':
 
-				uart_tx(va_arg (ap,int));
+				uart_tx_irq(va_arg (ap,int));
 
 				break;
 

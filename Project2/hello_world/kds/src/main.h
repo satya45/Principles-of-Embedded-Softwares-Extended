@@ -60,6 +60,7 @@ volatile uint16_t count;
 volatile uint16_t total_char;
 uint16_t arr[50];
 int j = 0;
-
+uint8_t tx_flag = 0;
+uint8_t rx_flag = 0;
 
 #endif /* MAIN_H_ */
