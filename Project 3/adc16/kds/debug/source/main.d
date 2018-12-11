@@ -23,8 +23,6 @@ source/main.o: \
  ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h \
  C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h \
  C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h \
- ../../../../../../platform/drivers/inc/fsl_adc16_driver.h \
- ../../../../../../platform/hal/inc/fsl_adc16_hal.h \
  C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/adc.h:
@@ -76,9 +74,5 @@ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h:
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h:
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h:
-
-../../../../../../platform/drivers/inc/fsl_adc16_driver.h:
-
-../../../../../../platform/hal/inc/fsl_adc16_hal.h:
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h:

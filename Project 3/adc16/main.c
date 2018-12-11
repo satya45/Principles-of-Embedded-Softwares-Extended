@@ -30,8 +30,6 @@
 #include "adc.h"
 #include "circbuff.h"
 #include "uart.h"
-#include "fsl_device_registers.h"
-#include "fsl_adc16_driver.h"
 #include "uart.h"
 #include <stdio.h>
 #include <string.h>
@@ -43,10 +41,10 @@ int main(void)
 {
 	hardware_init();
 	int input_size=100;
-	SMA = circbuff_init(input_size); //initializing circular buffer
+//	SMA = circbuff_init(input_size); //initializing circular buffer
+	adc_init();
 	dma_init();
 //	uart_init();
-	adc_init();
 	LED2_EN;
 	LED1_EN;
 	while(1)

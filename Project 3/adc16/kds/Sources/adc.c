@@ -18,15 +18,16 @@ int32_t adc_init(void)
 	}
 	/*Configuration of ADC*/
 	ADC0_CFG1=0;
-	ADC0_CFG1 |= ADC_CFG1_MODE(3) | ADC_CFG1_ADICLK(1) | ADC_CFG1_ADIV(3) | ADC_CFG1_ADLSMP(1);
-	ADC0_SC2 |= ADC_SC2_DMAEN_MASK;    // DMA Enable
 	ADC0_SC3=0;
-	ADC0_SC3 |= ADC_SC3_ADCO(1) | ADC_SC3_AVGE(1) | ADC_SC3_AVGS(3);
+	ADC0_CFG1 |= ADC_CFG1_MODE(3) | ADC_CFG1_ADICLK(1) | ADC_CFG1_ADIV(3) | ADC_CFG1_ADLSMP(1);
 	ADC0_SC1A |= ADC_SC1_DIFF_MASK| ADC_SC1_AIEN(0);
+	ADC0_SC3 |= ADC_SC3_ADCO(1) | ADC_SC3_AVGE(1) | ADC_SC3_AVGS(3);
+	ADC0_SC2 |= ADC_SC2_DMAEN_MASK;    // DMA Enable
 	ADC0_SC1A &= ~ADC_SC1_ADCH_MASK;
 	return 0;
-
 }
+
+
 
 uint16_t adc_read(uint8_t ch)
 
@@ -35,8 +36,9 @@ uint16_t adc_read(uint8_t ch)
 	while(ADC0_SC2 & ADC_SC2_ADACT_MASK); 	 // Conversion in progress
 	while(!(ADC0_SC1A & ADC_SC1_COCO_MASK)); // Run until the conversion is complete
 	return ADC0_RA;
-
 }
+
+
 
 int8_t adc_calib(void)
 {
