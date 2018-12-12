@@ -10,3 +10,7 @@ uint8_t tmp=0;
 int flag;
 void dma_init(void);
 void DMA0_IRQHandler(void);
+uint32_t *buff1, *buff2;
+uint8_t h1=0;
+uint8_t h2=127;
+

@@ -38,12 +38,28 @@
 #include "board.h"
 
 
+uint32_t* buffer_init(void)
+{
+
+	int *ptr = malloc(64 * sizeof(int));
+	if(ptr == 'NULL')
+	{
+		return 'NULL';
+	}
+	return ptr;
+
+}
+
 int main(void)
 {
 	hardware_init();
-	int input_size=100;
+	int16_t peak;
 	GPIO_TEST_EN;
-//	SMA = circbuff_init(input_size); //initializing circular buffer
+	buff1= buffer_init();
+	if(buff1 == 'NULL')
+	{
+		PRINTF("Buffer Initialization Failed");
+	}
 	adc_init();
 	dma_init();
 	LED2_EN;
@@ -52,20 +68,25 @@ int main(void)
 
 	while(1)
 	{
-//		if(flag==1)
-//		{
-//			for(int i=0; i<64; i++)
-//			{
-//			PRINTF("ADC DATA: %d\r\n", value[i]);
-//			}
-//			flag=0;
-//		}
+		if(flag==1)
+		{
+			//		peak= value[0];
+			//			for(int i=0; i<64; i++)
+			//			{
+			//				if(peak < value[i])
+			//				{
+			//					peak = value[i];
+			//				}
+			//				PRINTF("ADC DATA: %d\r\n", value[i]);
+			//			}
+//			PRINTF("PEAK VALUE : %d\r\n", peak);
+			flag=0;
+			DMA_DAR0= (uint32_t)buff1[h1];
+			DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);
+		}
+
 	}
 }
-
-
-
-
 
 
 
