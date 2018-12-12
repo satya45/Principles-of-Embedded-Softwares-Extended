@@ -1,5 +1,6 @@
 #include "adc.h"
 #include <stdint.h>
+#include "board.h"
 
 
 /*adc_init function Initializes ADC*/
@@ -9,8 +10,7 @@ int32_t adc_init(void)
 {
 	/*Enable ADC Clock gates*/
 	SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
-	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;	// PortE clock
-	SIM_CLKDIV1 |= SIM_CLKDIV1_OUTDIV4(7); //Bus clock divide by 8
+	SIM_CLKDIV1 |= SIM_CLKDIV1_OUTDIV4(2); //Bus clock divide by 8
 
 	if(adc_calib()==-1)
 	{
@@ -19,11 +19,12 @@ int32_t adc_init(void)
 	/*Configuration of ADC*/
 	ADC0_CFG1=0;
 	ADC0_SC3=0;
-	ADC0_CFG1 |= ADC_CFG1_MODE(3) | ADC_CFG1_ADICLK(1) | ADC_CFG1_ADIV(3) | ADC_CFG1_ADLSMP(1);
+	ADC0_CFG1 |= ADC_CFG1_MODE(3) | ADC_CFG1_ADICLK(0) | ADC_CFG1_ADIV(3) | ADC_CFG1_ADLSMP(1);
 	ADC0_SC1A |= ADC_SC1_DIFF_MASK| ADC_SC1_AIEN(0);
 	ADC0_SC3 |= ADC_SC3_ADCO(1) | ADC_SC3_AVGE(1) | ADC_SC3_AVGS(3);
-	ADC0_SC2 |= ADC_SC2_DMAEN_MASK;    // DMA Enable
+	 ADC0_SC2 |= ADC_SC2_DMAEN_MASK;    // DMA Enable
 	ADC0_SC1A &= ~ADC_SC1_ADCH_MASK;
+
 	return 0;
 }
 
@@ -68,3 +69,4 @@ int8_t adc_calib(void)
 
 		return 0;
 }
+

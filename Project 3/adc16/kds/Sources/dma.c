@@ -1,4 +1,6 @@
 #include "dma.h"
+#include "board.h"
+#include "fsl_debug_console.h"
 
 
 void dma_init(void)
@@ -11,9 +13,9 @@ void dma_init(void)
 	/*Configure Source and Dest*/
 	DMA_SAR0= (uint32_t)&ADC0_RA;
 	DMA_DAR0= (uint32_t)value;
-	DMA_DSR_BCR0 = DMA_DSR_BCR_BCR(4); // 4 bytes (32 bits) per transfer
-	DMA_DCR0 |= (DMA_DCR_EINT_MASK | DMA_DCR_ERQ_MASK | DMA_DCR_CS_MASK | DMA_DCR_SSIZE(0)|
-	DMA_DCR_DINC_MASK | DMA_DCR_DMOD(5) | DMA_DCR_DSIZE(0));
+	DMA_DSR_BCR0 = DMA_DSR_BCR_BCR(128); //
+	DMA_DCR0 |= (DMA_DCR_EINT_MASK | DMA_DCR_ERQ_MASK | DMA_DCR_CS_MASK | DMA_DCR_SSIZE(2)|
+	DMA_DCR_DINC_MASK | DMA_DCR_DMOD(0) | DMA_DCR_DSIZE(2));
 
 	// Enable DMA channel and source
 	DMAMUX0_CHCFG0 |= DMAMUX_CHCFG_ENBL(1) | DMAMUX_CHCFG_SOURCE(40); // Enable DMA channel and set ADC0 as source
@@ -26,14 +28,15 @@ void dma_init(void)
 void DMA0_IRQHandler(void)
 	{
 		/* Enable DMA0*/
+		GPIO_TEST_TOGGLE;
  		DMA_DSR_BCR0 |= DMA_DSR_BCR_DONE_MASK;	// Clear Done Flag
-		DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(4);		// Set byte count register
-//		addr[tmp]= DMA_DAR0;
-//		tmp++;
-//		if(tmp==64)
-//		{
-//		flag=1;
-//		}
+		DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);		// Set byte count register
+		for(int i=0; i<64; i++)
+					{
+					PRINTF("ADC DATA: %d\r\n", value[i]);
+					}
+
+		DMA_DAR0= (uint32_t)value;
 	}
 
 

@@ -33,27 +33,33 @@
 #include "uart.h"
 #include <stdio.h>
 #include <string.h>
-//#include "fsl_debug_console.h"
+#include "fsl_debug_console.h"
 #include "dma.h"
-//#include "board.h"
+#include "board.h"
+
 
 int main(void)
 {
 	hardware_init();
 	int input_size=100;
+	GPIO_TEST_EN;
 //	SMA = circbuff_init(input_size); //initializing circular buffer
 	adc_init();
 	dma_init();
-//	uart_init();
 	LED2_EN;
 	LED1_EN;
+	PRINTF("HELLO WORLD\r\n");
+
 	while(1)
 	{
-		if(flag==1)
-		{
-			LED1_ON;
-			flag=0;
-		}
+//		if(flag==1)
+//		{
+//			for(int i=0; i<64; i++)
+//			{
+//			PRINTF("ADC DATA: %d\r\n", value[i]);
+//			}
+//			flag=0;
+//		}
 	}
 }
 

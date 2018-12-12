@@ -3,9 +3,10 @@
 
 void dma_init(void);
 
-int32_t value[64];
-int32_t addr[64];
-int flag =0;
-int tmp=0;
+uint8_t vat[3];
+int16_t value[64];
+uint32_t addr[64];
+uint8_t tmp=0;
+int flag;
 void dma_init(void);
 void DMA0_IRQHandler(void);
