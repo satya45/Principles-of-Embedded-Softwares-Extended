@@ -13,7 +13,7 @@ void dma_init(void)
 	/*Configure Source and Dest*/
 	DMA_SAR0= (uint32_t)&ADC0_RA;
 	DMA_DAR0= (uint32_t)buff1[h1];
-//	buff2 = buff1+127;
+	//	buff2 = buff1+127;
 	DMA_DSR_BCR0 = DMA_DSR_BCR_BCR(128); //
 	DMA_DCR0 |= (DMA_DCR_EINT_MASK | DMA_DCR_ERQ_MASK | DMA_DCR_CS_MASK | DMA_DCR_SSIZE(2)|
 	DMA_DCR_DINC_MASK | DMA_DCR_DMOD(0) | DMA_DCR_DSIZE(2));
@@ -28,13 +28,14 @@ void dma_init(void)
 
 void DMA0_IRQHandler(void)
 	{
-		/* Enable DMA0*/
-		GPIO_TEST_TOGGLE;
-		h1 = (h1 + 1) % 128;
-		h2 = (h2 + 1) % 128;
-		DMA_DSR_BCR0 |= DMA_DSR_BCR_DONE_MASK;	// Clear Done Flag
-//		DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);		// Set byte count register
-		flag=1;
+	__disable_irq();
+	/* Enable DMA0*/
+	GPIO_TEST_TOGGLE;
+	h1 = (h1 + 1) % 128;
+	h2 = (h2 + 1) % 128;
+	DMA_DSR_BCR0 |= DMA_DSR_BCR_DONE_MASK;	// Clear Done Flag
+	dma_flag=1;
+	__enable_irq();
 	}
 
 

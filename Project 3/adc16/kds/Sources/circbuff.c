@@ -69,7 +69,7 @@ void circbuff_reset(circbuff *circ_b)
 circbuff * circbuff_init (int16_t length)
 {
 	my_circ_buff = (circbuff *) malloc(sizeof(circbuff));
-	my_circ_buff->buffer = (int16_t *)malloc (length);
+	my_circ_buff->buffer = (int8_t *)malloc (length);
 	if(my_circ_buff->buffer=='NULL')
 	{
 		myprintf("Initialization failed\r\n");

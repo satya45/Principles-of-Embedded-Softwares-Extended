@@ -38,6 +38,7 @@
 #include "board.h"
 
 
+
 uint32_t* buffer_init(void)
 {
 
@@ -54,6 +55,7 @@ int main(void)
 {
 	hardware_init();
 	int16_t peak;
+	int input_size=100;
 	GPIO_TEST_EN;
 	buff1= buffer_init();
 	if(buff1 == 'NULL')
@@ -68,25 +70,34 @@ int main(void)
 
 	while(1)
 	{
-		if(flag==1)
+		if (dma_flag)
 		{
-			//		peak= value[0];
-			//			for(int i=0; i<64; i++)
-			//			{
-			//				if(peak < value[i])
-			//				{
-			//					peak = value[i];
-			//				}
-			//				PRINTF("ADC DATA: %d\r\n", value[i]);
-			//			}
-//			PRINTF("PEAK VALUE : %d\r\n", peak);
-			flag=0;
+			for(int i=0; i<64; i++)
+			{
+				PRINTF("ADC DATA: %d\r\n", value[i]);
+				value[i] = value[i] * (-1);
+				value[i] = value[i]/1639;
+				for (uint8_t j=0;j<20;j++)
+				{
+					if (lookup[j].adc_value_q == value[i])
+					{
+						PRINTF("LOG VALUE: %f\r\n",lookup[j].dbfs);
+					}
+				}
+			}
+			__disable_irq();
+			dma_flag=0;
+			__enable_irq();
 			DMA_DAR0= (uint32_t)buff1[h1];
-			DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);
+//			DMA_DAR0= (uint32_t)value;
+			DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);		// Set byte count register
 		}
-
 	}
 }
+
+
+
+
 
 
 
