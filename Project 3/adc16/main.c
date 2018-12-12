@@ -38,30 +38,58 @@
 #include "board.h"
 
 
+#define DECAY (0.8)
 
-uint32_t* buffer_init(void)
+int16_t peak, max_peak=0;
+
+
+void log_value(void)
 {
+	peak = buff1[0];
+	for(int x = h2; x < (h2+64); x++)
+			{
+				PRINTF("ADC DATA: %d\r\n", buff1[x]);
 
-	int *ptr = malloc(64 * sizeof(int));
-	if(ptr == 'NULL')
+				if( buff1[x] < 0)
+				{
+					buff1[x] = buff1[x] * (-1);
+				}
+
+				if (peak < buff1[x])
+				{
+					peak = buff1[x];
+				}
+
+				buff1[x] = buff1[x]/1639;
+				for (uint8_t j=0;j<20;j++)
+				{
+					if (lookup[j].adc_value_q == buff1[x])
+					{
+						PRINTF("LOG VALUE: %f\r\n",lookup[j].dbfs);
+					}
+				}
+
+			}
+	if(peak > max_peak)
 	{
-		return 'NULL';
+		max_peak = peak;
 	}
-	return ptr;
+	else
+	{
+		max_peak = max_peak * DECAY;
+	}
+	PRINTF("MAX PEAK: %d\r\n", max_peak);
 
 }
+
+
+
 
 int main(void)
 {
 	hardware_init();
-	int16_t peak;
 	int input_size=100;
 	GPIO_TEST_EN;
-	buff1= buffer_init();
-	if(buff1 == 'NULL')
-	{
-		PRINTF("Buffer Initialization Failed");
-	}
 	adc_init();
 	dma_init();
 	LED2_EN;
@@ -70,27 +98,12 @@ int main(void)
 
 	while(1)
 	{
-		if (dma_flag)
+	if (dma_flag)
 		{
-			for(int i=0; i<64; i++)
-			{
-				PRINTF("ADC DATA: %d\r\n", value[i]);
-				value[i] = value[i] * (-1);
-				value[i] = value[i]/1639;
-				for (uint8_t j=0;j<20;j++)
-				{
-					if (lookup[j].adc_value_q == value[i])
-					{
-						PRINTF("LOG VALUE: %f\r\n",lookup[j].dbfs);
-					}
-				}
-			}
 			__disable_irq();
+			log_value();
 			dma_flag=0;
 			__enable_irq();
-			DMA_DAR0= (uint32_t)buff1[h1];
-//			DMA_DAR0= (uint32_t)value;
-			DMA_DSR_BCR0 |= DMA_DSR_BCR_BCR(128);		// Set byte count register
 		}
 	}
 }

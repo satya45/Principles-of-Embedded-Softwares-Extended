@@ -9,9 +9,10 @@ uint32_t addr[64];
 uint8_t tmp=0;
 volatile uint8_t dma_flag = 0;
 int flag;
-uint32_t *buff1, *buff2;
-uint8_t h1=0;
-uint8_t h2=127;
+int16_t buff1[128];
+int32_t *buff2;
+uint16_t h1=0;
+uint16_t h2=127;
 
 
 void dma_init(void);
