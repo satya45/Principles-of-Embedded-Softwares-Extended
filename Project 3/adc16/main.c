@@ -27,15 +27,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "adc.h"
-#include "circbuff.h"
-#include "uart.h"
-#include "uart.h"
 #include <stdio.h>
 #include <string.h>
-#include "fsl_debug_console.h"
+#include "adc.h"
+#include "uart.h"
 #include "dma.h"
 #include "board.h"
+#include "main.h"
+//#include "fsl_debug_console.h"
 
 
 #define DECAY (0.8)
@@ -43,12 +42,13 @@
 int16_t peak, max_peak=0;
 
 
+/*Function to calculate Peak and Log Values*/
 void log_value(void)
 {
 	peak = buff1[0];
-	for(int x = h2; x < (h2+64); x++)
+	for(int x = h1; x < (h1+64); x++)
 			{
-				PRINTF("ADC DATA: %d\r\n", buff1[x]);
+			myprintf(" ADC DATA: %d\r\n", buff1[x]);
 
 				if( buff1[x] < 0)
 				{
@@ -60,15 +60,17 @@ void log_value(void)
 					peak = buff1[x];
 				}
 
+				/*Uncomment following code to display LOG values of ADC Data*/
+				/*
 				buff1[x] = buff1[x]/1639;
 				for (uint8_t j=0;j<20;j++)
 				{
 					if (lookup[j].adc_value_q == buff1[x])
 					{
-						PRINTF("LOG VALUE: %f\r\n",lookup[j].dbfs);
+//						myprintf(" LOG VALUE:%f\r\n",lookup[j].dbfs);
 					}
 				}
-
+				 */
 			}
 	if(peak > max_peak)
 	{
@@ -78,8 +80,17 @@ void log_value(void)
 	{
 		max_peak = max_peak * DECAY;
 	}
-	PRINTF("MAX PEAK: %d\r\n", max_peak);
+	myprintf(" MAX PEAK: %d\r\n", max_peak);
+	max_peak = max_peak/1639;
+	for (uint8_t j=0;j<20;j++)
+	{
+		if (lookup[j].adc_value_q == max_peak)
+		{
+			myprintf(" LOG VALUE:%f\r\n",lookup[j].dbfs);
+		}
+	}
 
+	myprintf("******************************************\r\n\r\n");
 }
 
 
@@ -88,22 +99,21 @@ void log_value(void)
 int main(void)
 {
 	hardware_init();
-	int input_size=100;
+	uart_init();
 	GPIO_TEST_EN;
 	adc_init();
 	dma_init();
 	LED2_EN;
 	LED1_EN;
-	PRINTF("HELLO WORLD\r\n");
+	myprintf(" HELLO WORLD\r\n");
 
 	while(1)
 	{
+		//check DMA flag if raised
 	if (dma_flag)
 		{
-			__disable_irq();
 			log_value();
 			dma_flag=0;
-			__enable_irq();
 		}
 	}
 }

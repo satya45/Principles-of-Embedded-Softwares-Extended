@@ -1,3 +1,10 @@
+/****************************************************************
+ * Author : Satya Mehta and Siddhant Jajoo
+ * UART Initialization and ISR
+ *
+ */
+
+
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -115,8 +122,12 @@ void myprintf(char *str, ...)
 			switch (str[i])
 			{
 			case 'd':
-
 				number = va_arg (ap,int);
+				if(number & 0x8000)
+				{
+					number = (~number) + (0x0001);
+					uart_tx_irq(45);
+				}
 				divisor_check = number;
 				divisor = 0;
 				power = -1;
@@ -141,10 +152,24 @@ void myprintf(char *str, ...)
 				}
 				break;
 
+			case 'f':
+				db = va_arg(ap,double);
+//				number = db;
+//				float x = (float)db;
+				if(db < 0)
+				{
+					db = db * (-1);
+					uart_tx_irq(45);
+				}
+				number1 = (uint16_t)db;
+				myprintf(" %d",number1);
+				uart_tx_irq(46);
+				number1 = (uint16_t)((db - number1) * 100);
+				myprintf(" %d\r\n", number1);
+				break;
+
 			case 'c':
-
 				uart_tx_irq(va_arg (ap,int));
-
 				break;
 
 			}

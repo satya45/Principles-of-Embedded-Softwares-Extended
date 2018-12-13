@@ -6,8 +6,8 @@ source/main.o: \
  ../../../../../../platform/CMSIS/Include/core_cmInstr.h \
  ../../../../../../platform/CMSIS/Include/core_cmFunc.h \
  ../../../../../../platform/devices/MKL25Z4/startup/system_MKL25Z4.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h \
+ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h \
+ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h \
  ../../../../board.h ../../../../pin_mux.h ../../../../gpio_pins.h \
  ../../../../../../platform/drivers/inc/fsl_gpio_driver.h \
  ../../../../../../platform/hal/inc/fsl_port_hal.h \
@@ -18,12 +18,7 @@ source/main.o: \
  ../../../../../../platform/devices/MKL25Z4/include/fsl_bitaccess.h \
  ../../../../../../platform/devices/MKL25Z4/include/MKL25Z4_features.h \
  ../../../../../../platform/hal/inc/fsl_gpio_hal.h \
- ../../../../../../platform/utilities/inc/fsl_debug_console.h \
- ../../../../../../platform/osa/inc/fsl_os_abstraction.h \
- ../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h \
- C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h
+ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h
 
 C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/adc.h:
 
@@ -37,9 +32,9 @@ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/adc.h:
 
 ../../../../../../platform/devices/MKL25Z4/startup/system_MKL25Z4.h:
 
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h:
+C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h:
 
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h:
+C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h:
 
 ../../../../board.h:
 
@@ -65,14 +60,4 @@ C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h:
 
 ../../../../../../platform/hal/inc/fsl_gpio_hal.h:
 
-../../../../../../platform/utilities/inc/fsl_debug_console.h:
-
-../../../../../../platform/osa/inc/fsl_os_abstraction.h:
-
-../../../../../../platform/osa/inc/fsl_os_abstraction_bm.h:
-
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/uart.h:
-
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/circbuff.h:
-
-C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/dma.h:
+C:\Freescale\KSDK_1.3.0\examples\frdmkl25z\driver_examples\adc16\kds\inc/main.h:

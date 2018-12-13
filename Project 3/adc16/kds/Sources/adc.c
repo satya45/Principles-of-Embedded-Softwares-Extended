@@ -1,21 +1,25 @@
+/****************************************************************
+ * Author : Satya Mehta and Siddhant Jajoo
+ * ADC Initialization and ADC Read function
+ *
+ */
+
 #include "adc.h"
 #include <stdint.h>
 #include "board.h"
 
 
 /*adc_init function Initializes ADC*/
-
-
 int32_t adc_init(void)
 {
 	/*Enable ADC Clock gates*/
 	SIM_SCGC6 |= SIM_SCGC6_ADC0_MASK;
 	SIM_CLKDIV1 |= SIM_CLKDIV1_OUTDIV4(2); //Bus clock divide by 8
 
-	if(adc_calib()==-1)
-	{
-		return -1;
-	}
+//	if(adc_calib()==-1)
+//	{
+//		return -1;
+//	}
 	/*Configuration of ADC*/
 	ADC0_CFG1=0;
 	ADC0_SC3=0;
@@ -29,7 +33,7 @@ int32_t adc_init(void)
 }
 
 
-
+/*ADC Read Function*/
 uint16_t adc_read(uint8_t ch)
 
 {
@@ -41,6 +45,9 @@ uint16_t adc_read(uint8_t ch)
 
 
 
+/*
+ * CALIBRATION OF ADC
+ */
 int8_t adc_calib(void)
 {
 

@@ -5,19 +5,16 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Sources/adc.c \
-../Sources/circbuff.c \
 ../Sources/dma.c \
 ../Sources/uart.c 
 
 OBJS += \
 ./Sources/adc.o \
-./Sources/circbuff.o \
 ./Sources/dma.o \
 ./Sources/uart.o 
 
 C_DEPS += \
 ./Sources/adc.d \
-./Sources/circbuff.d \
 ./Sources/dma.d \
 ./Sources/uart.d 
 
