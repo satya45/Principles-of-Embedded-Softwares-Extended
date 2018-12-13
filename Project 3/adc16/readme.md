@@ -1,0 +1,6 @@
+-------------------------Bare Metal Firmware on FRDM KL25Z. PRINCIPLES OF EMBEDDED SOFTWARE PROJECT-2--------------------------------------
+
+This report has comprehensively covered all the modules , functions , their description, the different modes implemented in UART  and answers to relevant questions.
+This project covers implementation of 16 bit ADC in differential mode. The ADC configuration includes selection of proper clock and bits in the ADC register to run it at more than 8 KHz sampling frequency. During the initial phase of the project the ADC reading was obtained using Adc_read function to check whether the ADC is properly configured or not. The next step was to configure the ADC to enable the DMA request. The output of the ADC module is directly transferred to the buffer using DMA. 
+	The DMA configuration includes clocks, selecting the source and destination registers and selecting DMA write sizes. The data that is written using DMA is of type int16_t. The DMA byte counter is set to 128 bytes. Hence, the interrupt will be generated after 128 bytes of data write. A double buffer has also been implemented where at a given time a part of the buffer will be used by the processor and a part by the DMA to load the ADC data. 
+	The buffer data is processed to calculate peak, logarithmic values and displayed on the terminal using UART. 
