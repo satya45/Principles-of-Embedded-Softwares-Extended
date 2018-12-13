@@ -1,4 +1,4 @@
--------------------------Bare Metal Firmware on FRDM KL25Z. PRINCIPLES OF EMBEDDED SOFTWARE PROJECT-2--------------------------------------
+-------------------------Bare Metal Firmware on FRDM KL25Z. PRINCIPLES OF EMBEDDED SOFTWARE PROJECT-3--------------------------------------
 
 This report has comprehensively covered all the modules , functions , their description, the different modes implemented in UART  and answers to relevant questions.
 This project covers implementation of 16 bit ADC in differential mode. The ADC configuration includes selection of proper clock and bits in the ADC register to run it at more than 8 KHz sampling frequency. During the initial phase of the project the ADC reading was obtained using Adc_read function to check whether the ADC is properly configured or not. The next step was to configure the ADC to enable the DMA request. The output of the ADC module is directly transferred to the buffer using DMA. 
