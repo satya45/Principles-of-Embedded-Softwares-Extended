@@ -7,7 +7,7 @@ ifeq ($(PLATFORM),HOST)
 	CC = gcc
 	FLAGS= -D$(TARGET)
 	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c
+	SRC := main.c logger.c temp.c light.c sockets.c my_signal.c queue.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 endif
@@ -16,7 +16,7 @@ ifeq	($(PLATFORM),BBG)
 	CC=arm-linux-gcc
 	FLAGS= -D$(TARGET)
 	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c
+	SRC := main.c logger.c temp.c light.c sockets.c my_signal.c queue.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 
@@ -28,4 +28,4 @@ build: 	$(OBJ)
 
 	
 clean:
-	rm -f *.o *.elf *.map *.
+	rm -f $(TARGET) *.o *.elf *.map *. *.txt
