@@ -1,4 +1,4 @@
-PLATFORM=HOST
+PLATFORM=BBG
 vpath %.c src/
 TARGET= project1
 INCLUDES_COMMON= -I inc/
@@ -7,7 +7,7 @@ ifeq ($(PLATFORM),HOST)
 	CC = gcc
 	FLAGS= -D$(TARGET)
 	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c my_signal.c queue.c
+	SRC := main.c logger.c temp.c light.c sockets.c gpio.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 endif
@@ -16,7 +16,7 @@ ifeq	($(PLATFORM),BBG)
 	CC=arm-linux-gcc
 	FLAGS= -D$(TARGET)
 	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c my_signal.c queue.c
+	SRC := main.c logger.c temp.c light.c sockets.c gpio.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 
@@ -28,4 +28,4 @@ build: 	$(OBJ)
 
 	
 clean:
-	rm -f $(TARGET) *.o *.elf *.map *. *.txt
+	rm -f *.o *.elf *.map
