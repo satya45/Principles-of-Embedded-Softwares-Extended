@@ -1,6 +1,7 @@
 #include "light.h"
 
 char read_buff;
+/*
 void *light_thread(void *f)
 {
     printf("In light thread");
@@ -28,6 +29,25 @@ void *light_thread(void *f)
     write_int_th(0x50, ADC1_TH_SEL);
     th = read_int_th(ADC1_TH_SEL);
     printf("Data read from the ADC1 threshold %x\n",th);
+}
+*/
+
+sensor_struct read_light_data(void)
+{
+    sensor_struct read_data;
+    if (ioctl(i2c_open, I2C_SLAVE, LIGHT_ADDR) < 0) 
+    {
+        error_log("ERROR: ioctl(); in read_light_data function");
+    }
+    write_command(CNTRL_REG);
+    char buff = 0x03;
+    if(write(i2c_open,&buff,1) != 1) 
+    {
+       error_log("ERROR: write(); in read_light_data function");
+    }
+    read_data.id = LIGHT_RCV_ID;
+    read_data.sensor_data.light_data.light = lux_data();
+    return read_data;    
 }
 
 err_t light_id(void)

@@ -1,13 +1,14 @@
 #ifndef _LIGHT_H
 #define _LIGHT_H
 #include <stdio.h>
-#include "main.h"
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <math.h>
 #include <unistd.h>
+#include "main.h"
+
 
 #define LIGHT_ADDR          0x39
 #define CNTRL_REG           0x00
@@ -35,7 +36,6 @@
 #define INT_DIS_MASK        0x00
 
 
-void *light_thread(void *);
 err_t light_id(void);
 err_t write_command(uint8_t);
 uint16_t ADC_CH0(void);
@@ -46,4 +46,5 @@ err_t write_timing_reg(uint8_t);
 err_t write_int_ctrl(uint8_t);
 uint16_t read_int_th(uint8_t);
 err_t write_int_th(uint16_t, uint8_t);
+sensor_struct read_light_data(void);
 #endif

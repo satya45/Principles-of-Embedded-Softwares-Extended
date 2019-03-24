@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <signal.h>
-#include <queue.h>
+#include "queue.h"
+#include "main.h"
 
-void sig_init(void);
+err_t sig_init(void);
 void signal_handler(int signo, siginfo_t *info, void *extra);
 
 #endif

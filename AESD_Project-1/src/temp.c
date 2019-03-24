@@ -11,61 +11,41 @@
 #include "temp.h"
 #include "gpio.h"
 
-void *temp_thread(void * a)
-{ 
-    gpio_init(LED1);
-    while(1)
-    {
-        for(int i = 0; i < 100000000; i++);
-        gpio_ctrl(GPIO53, GPIO53_V, 1);
-        for(int i = 0; i < 100000000; i++);
-        gpio_ctrl(GPIO53, GPIO53_V, 0);
-    }
-   // read_temp_data();
-    // read_temp_reg(THIGH_REG);
-    // read_temp_reg(TLOW_REG);
-    // read_temp_reg(CONFIG_REG);
-    // //shutdown_mode();
-    // read_temp_reg(CONFIG_REG);
-    // write_tlow(50);
-    // read_temp_reg(TLOW_REG);
-    // write_thigh(70); //write Thigh register
-    // read_temp_reg(THIGH_REG);
 
-}
 
-err_t read_temp_data(void)
+sensor_struct read_temp_data(uint8_t temp_unit)
 {
     int temp;
     char temp_buff[2];
     int temp_data[2];
-    temp_struct obj;
+    sensor_struct read_data;
     write_pointer(TEMP_REG);
-    if((i2c_open = open(I2C_BUS, O_RDWR)) < 0)
-    {
-        perror("Error opening I2C bus\n");
-        return errno;
-    }
-    if (ioctl(i2c_open, I2C_SLAVE, TEMP_ADDR) < 0) 
-    {
-        perror("Failed to acquire bus");
-        return errno;
-    }
+    
     if (read(i2c_open,temp_buff,2) != 2) 
     {
        perror("Failed to read from the i2c bus.\n");
-       return errno;
+       
     }
     temp_data[0] = (int)temp_buff[0]; //storing MSB
     temp_data[1] = (int)temp_buff[1]; //storing LSB
-    obj.temp_c = (float)((temp_data[0] << 8 |temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
-   // obj.far = (obj.cel * 9.0/5.0) + 32;
-    //obj.kel = obj.cel + 273.15;
-    printf("Temperature in Celsius : %f\n", obj.temp_c);
-    obj.id = temp_rcv;
-   // printf("Temperature in Farheneit : %f\n", obj.far);
-    //printf("Temperature in Kelvin : %f\n", obj.kel);
-    return 0;
+    
+    
+    read_data.id = TEMP_RCV_ID;
+    if (clock_gettime(CLOCK_REALTIME, &read_data.sensor_data.temp_data.data_time))
+    {
+        perror("clock_gettime() for temperature.\n");
+    }
+    read_data.sensor_data.temp_data.temp_c = (float)((temp_data[0] << 8 |temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
+    
+    if (temp_unit == 1)
+    {
+        read_data.sensor_data.temp_data.temp_c = read_data.sensor_data.temp_data.temp_c + 273;
+    }
+    else if (temp_unit == 2)
+    {
+        read_data.sensor_data.temp_data.temp_c = ((9.0/5.0)*(read_data.sensor_data.temp_data.temp_c)) + 32;
+    }
+    return read_data;
 }
 
 err_t read_temp_reg(uint8_t reg)
@@ -144,6 +124,13 @@ err_t write_pointer(uint8_t reg)
 {
     int rc;
     char buff[4] = {0x00, 0x01, 0x02, 0x03};
+    
+    if (ioctl(i2c_open, I2C_SLAVE, TEMP_ADDR) < 0) 
+    {
+        perror("Failed to acquire bus");
+        
+    }
+    
     if (rc = write(i2c_open,&buff[reg],1) != 1) 
     {
        perror("Failed to write to the i2c bus.\n");

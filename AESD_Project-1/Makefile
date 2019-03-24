@@ -3,20 +3,20 @@ vpath %.c src/
 TARGET= project1
 INCLUDES_COMMON= -I inc/
 
-ifeq ($(PLATFORM),HOST)
+ifeq 	($(PLATFORM),HOST)
 	CC = gcc
 	FLAGS= -D$(TARGET)
-	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c gpio.c
+	LDFLAGS = -lpthread -lrt -lm
+	SRC := main.c logger.c temp.c light.c sockets.c queue.c my_signal.c gpio.c timer.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 endif
 
-ifeq	($(PLATFORM),BBG)
-	CC=arm-linux-gcc
+ifeq 	($(PLATFORM),BBG)
+	CC=~/APES/build/buildroot/output/host/usr/bin/arm-linux-gcc
 	FLAGS= -D$(TARGET)
-	LDFLAGS = -lpthread -lrt
-	SRC := main.c logger.c temp.c light.c sockets.c gpio.c
+	LDFLAGS = -lpthread -lrt -lm
+	SRC := main.c logger.c temp.c light.c sockets.c queue.c my_signal.c gpio.c timer.c
 	OBJ := $(SRC:.c=.o)
 	CFLAGS = -g $(INCLUDES_COMMON)
 
@@ -28,4 +28,4 @@ build: 	$(OBJ)
 
 	
 clean:
-	rm -f *.o *.elf *.map
+	rm -f $(TARGET) *.o *.elf *.map
