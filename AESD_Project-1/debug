@@ -1,0 +1,16 @@
+Timestamp: 140567225676271 seconds and 1553557975 nanoseconds.
+ERROR: i2c_open(); in i2c_init() function.
+No such file or directory.
+
+***********************************
+
+Timestamp: 93936149281180 seconds and 1553557975 nanoseconds.
+ERROR: remove(); cannot delete log file.
+No such file or directory.
+
+***********************************
+
+In Temperature Thread.
+In logger Thread.
+In light Thread.
+In socket Thread.

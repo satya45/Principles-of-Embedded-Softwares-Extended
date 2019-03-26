@@ -22,7 +22,7 @@ char x[100];
 
 //function declarations
 int queue_init(void);
-void queue_send(sensor_struct data_send);
+void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel);
 sensor_struct queue_receive(mqd_t mq);
 err_t queues_close(void);
 err_t queues_unlink(void);
