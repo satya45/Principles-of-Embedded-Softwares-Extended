@@ -30,6 +30,9 @@ void signal_handler(int signo, siginfo_t *info, void *extra)
 			error_log("ERROR: pthread_mutex_destroy(mutex_error); cannot destroy mutex_error");
 		}
 
+		//delete timers
+
+		main_exit = 1;
 		printf("\nTerminating due to signal number = %d.\n", signo);
 		//The below command should come after printing terminating in the text file.
 		exit(EXIT_SUCCESS);

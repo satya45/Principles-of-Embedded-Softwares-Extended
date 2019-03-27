@@ -44,6 +44,27 @@ err_t timer_init(uint8_t timer_handle)
 
         timer_settime(timeout_light, 0, &trigger_light, NULL);
     }
+    else if (timer_handle == TIMER_HB)
+    {
+        timer_t timeout_hb;
+        struct itimerspec trigger_hb;
+        struct sigevent sev_hb;
+        memset(&sev_hb, 0, sizeof(struct sigevent));
+        memset(&trigger_hb, 0, sizeof(struct itimerspec));
+
+        sev_hb.sigev_notify = SIGEV_THREAD;
+        sev_hb.sigev_notify_function = &timer_handler;
+        sev_hb.sigev_value.sival_int = timer_handle;
+        timer_create(CLOCK_REALTIME, &sev_hb, &timeout_hb);
+
+        //Setting the first timer interval and the repeating timer interval
+        trigger_hb.it_value.tv_sec = HB_INTERVAL_SEC;
+        trigger_hb.it_interval.tv_sec = HB_INTERVAL_SEC;
+        trigger_hb.it_value.tv_nsec = HB_INTERVAL_NSEC;
+        trigger_hb.it_interval.tv_nsec = HB_INTERVAL_NSEC;
+
+        timer_settime(timeout_hb, 0, &trigger_hb, NULL);
+    }
     return OK;
 }
 
@@ -64,5 +85,10 @@ void timer_handler(union sigval sv)
         //timer_event |= LIGHT_EVENT;
         //pthread_mutex_unlock(&mutex_a);
         printf("In Timer Handler: Light Sensor Timer fired.\n");
+    }
+    else if (sv.sival_int == TIMER_HB)
+    {
+        hb_send(CLEAR_HB);
+        printf("In Timer Handler: Heartbeat Timer fired.\n");
     }
 }

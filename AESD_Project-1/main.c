@@ -22,6 +22,9 @@
 pthread_t my_thread[4];
 //pthread_mutex_t mutex_a;
 pthread_attr_t my_attributes;
+volatile static uint32_t temp_hb_value;
+volatile static uint32_t light_hb_value;
+volatile static uint32_t logger_hb_value;
 char *a;
 
 int main(int argc, char *argv[])
@@ -63,8 +66,10 @@ int main(int argc, char *argv[])
 		g_ll = ERROR;
 	}
 
+	//Global Variables Initialization
 	temp_timerflag = 0;
 	light_timerflag = 0;
+	main_exit = 0;
 
 	srand(time(NULL));
 	sig_init();
@@ -87,6 +92,13 @@ int main(int argc, char *argv[])
 	}
 
 	create_threads(filename);
+
+	timer_init(TIMER_HB);
+
+	while (!main_exit)
+	{
+		hb_handle(hb_receive());
+	}
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -113,7 +125,7 @@ void *temp_thread(void *filename)
 
 			//Insert Mutex lock here
 			temp_timerflag = 0;
-			queue_send(log_mq, read_temp_data(TEMP_UNIT), INFO_DEBUG);
+			//queue_send(log_mq, read_temp_data(TEMP_UNIT), INFO_DEBUG);
 
 			//data_send.id = TEMP_RCV_ID;
 			//data_send.sensor_data.temp_data.temp_c = rand();
@@ -121,6 +133,8 @@ void *temp_thread(void *filename)
 
 			//Insert mutex Unlock here
 			pthread_mutex_unlock(&mutex_a);
+
+			hb_send(TEMP_HB);
 		}
 	}
 }
@@ -140,7 +154,7 @@ void *light_thread(void *filename)
 			printf("In main loop: Light timer event handled.\n");
 			//Insert Mutex lock here
 			light_timerflag = 0;
-			queue_send(log_mq, read_light_data(), INFO_DEBUG);
+			//queue_send(log_mq, read_light_data(), INFO_DEBUG);
 
 			//data_send.id = LIGHT_RCV_ID;
 			//data_send.sensor_data.light_data.light = rand() % 10;
@@ -148,6 +162,8 @@ void *light_thread(void *filename)
 
 			//Insert mutex Unlock here
 			pthread_mutex_unlock(&mutex_a);
+
+			hb_send(LIGHT_HB);
 		}
 	}
 }
@@ -158,6 +174,8 @@ void *logger_thread(void *filename)
 	while (1)
 	{
 		log_data(queue_receive(log_mq));
+
+		hb_send(LOGGER_HB);
 	}
 }
 
@@ -264,4 +282,87 @@ void error_log(char *error_str)
 void msg_log(char *str, uint8_t loglevel)
 {
 	queue_send(log_mq, read_msg(str), loglevel);
+}
+
+void hb_send(uint8_t hb_value)
+{
+	ssize_t res;
+	res = mq_send(heartbeat_mq, (char *)&hb_value, sizeof(uint8_t), 0);
+	if (res == -1)
+	{
+		//How to identify error due to which queue???? think!!!!!
+		error_log("ERROR: mq_send(); in queue_send() function");
+	}
+}
+
+uint8_t hb_receive(void)
+{
+	ssize_t res;
+	uint8_t hb_rcv;
+	res = mq_receive(heartbeat_mq, (char *)&hb_rcv, sizeof(sensor_struct), NULL);
+	if (res == -1)
+	{
+		error_log("ERROR: mq_receive(); in queue_receive() function");
+	}
+	return hb_rcv;
+}
+
+void hb_handle(uint8_t hb_rcv)
+{
+	switch (hb_rcv)
+	{
+	case TEMP_HB:
+	{
+		temp_hb_value++;
+		printf("temp hb received %d.\n", temp_hb_value);
+		break;
+	}
+
+	case LIGHT_HB:
+	{
+		light_hb_value++;
+		printf("light hb received %d.\n", light_hb_value);
+		break;
+	}
+
+	case LOGGER_HB:
+	{
+		logger_hb_value++;
+		printf("Logger hb received %d.\n", logger_hb_value);
+		break;
+	}
+
+	case CLEAR_HB:
+	{
+		if (temp_hb_value == 0)
+		{
+			//handle if heartbeats not received
+		}
+		else
+		{
+			temp_hb_value = 0;
+		}
+
+		if (light_hb_value == 0)
+		{
+			//handle if heartbeats not received
+		}
+		else
+		{
+			light_hb_value = 0;
+		}
+
+		if (logger_hb_value == 0)
+		{
+			//handle if heartbeats not received
+		}
+		else
+		{
+			logger_hb_value = 0;
+		}
+
+		printf("All hb values cleared:\ntemp=%d \nlight=%d \nlogger=%d.\n", temp_hb_value, light_hb_value, logger_hb_value);
+		break;
+	}
+	}
 }
