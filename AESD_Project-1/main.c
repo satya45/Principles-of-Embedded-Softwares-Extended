@@ -1,5 +1,4 @@
 
-
 //#include <string.h>
 #include <pthread.h>
 #include <sched.h>
@@ -16,16 +15,16 @@
 #include "sockets.h"
 #include "my_signal.h"
 #include "queue.h"
+#include "gpio.h"
 #include "timer.h"
 
 //Global Variables
 pthread_t my_thread[4];
-//pthread_mutex_t mutex_a;
 pthread_attr_t my_attributes;
 volatile static uint32_t temp_hb_value;
 volatile static uint32_t light_hb_value;
 volatile static uint32_t logger_hb_value;
-char *a;
+
 
 int main(int argc, char *argv[])
 {
@@ -66,11 +65,10 @@ int main(int argc, char *argv[])
 		g_ll = ERROR;
 	}
 
-	//Global Variables Initialization
 	temp_timerflag = 0;
 	light_timerflag = 0;
 	main_exit = 0;
-
+	gpio_init(LED1);
 	srand(time(NULL));
 	sig_init();
 	queue_init();
@@ -86,13 +84,18 @@ int main(int argc, char *argv[])
 		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
 	}
 
+	if (pthread_mutex_init(&mutex_b, NULL))
+	{
+		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
+	}
+
 	if (remove(filename))
 	{
 		error_log("ERROR: remove(); cannot delete log file");
 	}
 
 	create_threads(filename);
-
+	
 	timer_init(TIMER_HB);
 
 	while (!main_exit)
@@ -113,29 +116,54 @@ int main(int argc, char *argv[])
 void *temp_thread(void *filename)
 {
 	msg_log("In Temperature Thread.\n", DEBUG);
-
 	timer_init(TIMER_TEMP);
-
+	sensor_struct data_send;
+	
 	while (1)
 	{
 		if (temp_timerflag)
 		{
-			pthread_mutex_lock(&mutex_a);
-			printf("In main loop: Temperature Timer event handled.\n");
-
+			pthread_mutex_lock(&mutex_b);
+			//printf("In main loop: Temperature Timer event handled.\n");
 			//Insert Mutex lock here
 			temp_timerflag = 0;
-			//queue_send(log_mq, read_temp_data(TEMP_UNIT), INFO_DEBUG);
+			queue_send(log_mq, read_temp_data(TEMP_UNIT, TEMP_RCV_ID), INFO_DEBUG);
 
-			//data_send.id = TEMP_RCV_ID;
-			//data_send.sensor_data.temp_data.temp_c = rand();
+			// data_send.id = SOCK_RCV_ID;
+			// data_send.sensor_data.temp_data.temp_c = rand();
 			//queue_send(log_mq, data_send, INFO_DEBUG);
 
 			//Insert mutex Unlock here
-			pthread_mutex_unlock(&mutex_a);
-
+			pthread_mutex_unlock(&mutex_b);
 			hb_send(TEMP_HB);
 		}
+		
+		pthread_mutex_lock(&mutex_b);
+		if (socket_flag & TC)
+		{
+			printf("Socket Flag TC set\n");
+			// queue_send(log_mq, data_send, INFO_DEBUG);
+			// queue_send(sock_mq, data_send, INFO_DEBUG);
+			queue_send(log_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG);
+
+			socket_flag &= (~TC);
+		}
+		else if (socket_flag & TF)
+		{
+			socket_flag &= (~TF);
+			queue_send(log_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_temp_data(2,SOCK_TEMP_RCV_ID), INFO_DEBUG);
+		}
+		else if (socket_flag & TK)
+		{
+			//queue_send(log_mq, data_send, INFO_DEBUG);
+			//queue_send(sock_mq, data_send, INFO_DEBUG);
+			socket_flag &= (~TK);
+			queue_send(log_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_temp_data(1,SOCK_TEMP_RCV_ID), INFO_DEBUG);
+		}
+		pthread_mutex_unlock(&mutex_b);
 	}
 }
 
@@ -144,27 +172,51 @@ void *light_thread(void *filename)
 	msg_log("In light Thread.\n", DEBUG);
 
 	timer_init(TIMER_LIGHT);
-
+	sensor_struct data_send;
+	uint16_t ch0, ch1;
+	read_light_data(LIGHT_RCV_ID);
 	while (1)
 	{
 
+
 		if (light_timerflag)
 		{
-			pthread_mutex_lock(&mutex_a);
-			printf("In main loop: Light timer event handled.\n");
+			ch0 = read_adc0();
+			printf("Channel 0 data %d\n",ch0);
+			if(ch0 > 75)
+			{
+				gpio_ctrl(GPIO53, GPIO53_V, 1);
+			}
+			else
+			{
+				gpio_ctrl(GPIO53, GPIO53_V, 0);
+			}
+		// 	ch1 = ADC_CH1();
+		// 	printf("Channel 0 data %d\n",ch1);
+			
+			pthread_mutex_lock(&mutex_b);
+			//printf("In main loop: Light timer event handled.\n");
 			//Insert Mutex lock here
 			light_timerflag = 0;
-			//queue_send(log_mq, read_light_data(), INFO_DEBUG);
+			queue_send(log_mq, read_light_data(LIGHT_RCV_ID), INFO_DEBUG);
 
-			//data_send.id = LIGHT_RCV_ID;
-			//data_send.sensor_data.light_data.light = rand() % 10;
+			// data_send.id = LIGHT_RCV_ID;
+			// data_send.sensor_data.light_data.light = rand() % 10;
 			//queue_send(log_mq, data_send, INFO_DEBUG);
 
 			//Insert mutex Unlock here
-			pthread_mutex_unlock(&mutex_a);
-
+			pthread_mutex_unlock(&mutex_b);
 			hb_send(LIGHT_HB);
+
 		}
+		if (socket_flag & L)
+		{
+			printf("Socket Flag TC set\n");
+			queue_send(log_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG);
+			socket_flag &= (~L);
+		}
+		
 	}
 }
 
@@ -174,7 +226,6 @@ void *logger_thread(void *filename)
 	while (1)
 	{
 		log_data(queue_receive(log_mq));
-
 		hb_send(LOGGER_HB);
 	}
 }
@@ -182,6 +233,16 @@ void *logger_thread(void *filename)
 void *sock_thread(void *filename)
 {
 	msg_log("In socket Thread.\n", DEBUG);
+	socket_init();
+	while (1)
+	{	
+		socket_listen();
+		handle_socket_req();
+		//pthread_mutex_lock(&mutex_b);
+		socket_send(queue_receive(sock_mq));
+		//pthread_mutex_unlock(&mutex_b);
+		
+	}
 }
 
 err_t create_threads(char *filename)

@@ -46,5 +46,6 @@ err_t write_timing_reg(uint8_t);
 err_t write_int_ctrl(uint8_t);
 uint16_t read_int_th(uint8_t);
 err_t write_int_th(uint16_t, uint8_t);
-sensor_struct read_light_data(void);
+sensor_struct read_light_data(uint8_t);
+uint16_t read_adc0(void);
 #endif

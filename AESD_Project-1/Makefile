@@ -1,4 +1,4 @@
-PLATFORM=HOST
+PLATFORM=BBG
 vpath %.c src/
 TARGET= project1
 INCLUDES_COMMON= -I inc/
@@ -13,7 +13,7 @@ ifeq 	($(PLATFORM),HOST)
 endif
 
 ifeq 	($(PLATFORM),BBG)
-	CC=~/APES/build/buildroot/output/host/usr/bin/arm-linux-gcc
+	CC=arm-linux-gcc
 	FLAGS= -D$(TARGET)
 	LDFLAGS = -lpthread -lrt -lm
 	SRC := main.c logger.c temp.c light.c sockets.c queue.c my_signal.c gpio.c timer.c

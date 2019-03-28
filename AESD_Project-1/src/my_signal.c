@@ -6,16 +6,19 @@ err_t sig_init()
 	struct sigaction send_sig;
 	send_sig.sa_flags = SA_SIGINFO;
 	send_sig.sa_sigaction = &signal_handler;
-	if(sigaction(SIGINT, &send_sig, NULL))
+	if (sigaction(SIGINT, &send_sig, NULL))
 	{
 		error_log("ERROR: sigaction(); in sig_init() function");
 	}
+	if (sigaction(SIGPIPE, &send_sig, NULL))
+	{
+		error_log("ERROR: sigaction(); in sig_init() SIGPIPE function");
+	}
 }
-
 
 void signal_handler(int signo, siginfo_t *info, void *extra)
 {
-	if(signo == 2)
+	if (signo == 2)
 	{
 		queues_close();
 		queues_unlink();
@@ -36,5 +39,9 @@ void signal_handler(int signo, siginfo_t *info, void *extra)
 		printf("\nTerminating due to signal number = %d.\n", signo);
 		//The below command should come after printing terminating in the text file.
 		exit(EXIT_SUCCESS);
+	}
+	if (signo == 13)
+	{
+		printf("Sigpipe rcvd\n");
 	}
 }

@@ -76,7 +76,7 @@ void timer_handler(union sigval sv)
         temp_timerflag = 1;
         //timer_event |= TEMP_EVENT;
         //pthread_mutex_unlock(&mutex_a);
-        printf("In Timer Handler: Temperature Sensor Timer fired.\n");
+        //printf("In Timer Handler: Temperature Sensor Timer fired.\n");
     }
     else if (sv.sival_int == TIMER_LIGHT)
     {
@@ -84,7 +84,7 @@ void timer_handler(union sigval sv)
         light_timerflag = 1;
         //timer_event |= LIGHT_EVENT;
         //pthread_mutex_unlock(&mutex_a);
-        printf("In Timer Handler: Light Sensor Timer fired.\n");
+        //printf("In Timer Handler: Light Sensor Timer fired.\n");
     }
     else if (sv.sival_int == TIMER_HB)
     {

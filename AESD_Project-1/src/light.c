@@ -32,7 +32,7 @@ void *light_thread(void *f)
 }
 */
 
-sensor_struct read_light_data(void)
+sensor_struct read_light_data(uint8_t id)
 {
     sensor_struct read_data;
     if (ioctl(i2c_open, I2C_SLAVE, LIGHT_ADDR) < 0) 
@@ -45,7 +45,7 @@ sensor_struct read_light_data(void)
     {
        error_log("ERROR: write(); in read_light_data function");
     }
-    read_data.id = LIGHT_RCV_ID;
+    read_data.id = id;
     if (clock_gettime(CLOCK_REALTIME, &read_data.sensor_data.light_data.data_time))
     {
         error_log("ERROR: clock_gettime(); in read_light_data() function");
@@ -111,6 +111,22 @@ uint16_t ADC_CH0(void)
 
 }
 
+uint16_t read_adc0(void)
+{
+    uint16_t data;
+    if((i2c_open = open(I2C_BUS, O_RDWR)) < 0)
+    {
+        error_log("ERROR: open(); in light_id() function");
+    }
+    if (ioctl(i2c_open, I2C_SLAVE, LIGHT_ADDR) < 0) 
+    {
+        error_log("ERROR: ioctl(); in light_id() function");
+    }
+    data = ADC_CH0();
+    return data;
+
+}
+
 uint16_t ADC_CH1(void)
 {
     uint8_t lsb, msb;
@@ -158,6 +174,7 @@ float lux_data(void)
         lux_data = 0;
     }
     return lux_data;
+    //return adc0;
 }
 
 err_t read_light_reg(uint8_t reg)

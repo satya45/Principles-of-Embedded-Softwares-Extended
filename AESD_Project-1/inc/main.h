@@ -32,12 +32,12 @@
 #define WARNING (0x02)
 #define ERROR (0x04)
 #define DEBUG (0x08)
-
 #define INFO_DEBUG (0x0A)
 
 //#define BACKUP_FILENAME			("backup")
 
 pthread_mutex_t mutex_a;
+pthread_mutex_t mutex_b;
 pthread_mutex_t mutex_error;
 
 int i2c_open;
@@ -46,6 +46,7 @@ volatile uint8_t temp_timerflag;
 volatile uint8_t light_timerflag;
 uint8_t g_ll;
 uint8_t main_exit;
+volatile uint8_t socket_flag;
 
 //char *backup = BACKUP_FILENAME;
 
@@ -53,6 +54,8 @@ uint8_t main_exit;
 #define LIGHT_RCV_ID (2)
 #define ERROR_RCV_ID (3)
 #define MSG_RCV_ID (4)
+#define SOCK_TEMP_RCV_ID (5)
+#define SOCK_LIGHT_RCV_ID (6)
 
 typedef uint32_t err_t;
 

@@ -11,7 +11,7 @@
 #include "temp.h"
 #include "gpio.h"
 
-sensor_struct read_temp_data(uint8_t temp_unit)
+sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
 {
     int temp;
     char temp_buff[2];
@@ -26,7 +26,7 @@ sensor_struct read_temp_data(uint8_t temp_unit)
     temp_data[0] = (int)temp_buff[0]; //storing MSB
     temp_data[1] = (int)temp_buff[1]; //storing LSB
 
-    read_data.id = TEMP_RCV_ID;
+    read_data.id = id;
     if (clock_gettime(CLOCK_REALTIME, &read_data.sensor_data.temp_data.data_time))
     {
         error_log("ERROR: clock_gettime(); in read_temp_data() function");
