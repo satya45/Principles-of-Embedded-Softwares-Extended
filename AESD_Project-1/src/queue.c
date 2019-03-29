@@ -1,10 +1,28 @@
 
+/**
+ * @file queue.c
+ * @author Siddhant Jajoo and Satya Mehta
+ * @brief This file consists of all the functions related to queue initialization, sending,
+ * receiving, closing and unlinking.
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include "queue.h"
 
+/**
+ * @brief - This function initializes and creates all the message queues required in the application.
+ * 
+ * @return int 
+ */
 int queue_init(void)
 {
 	struct mq_attr attr;
 
+	//Assigning the appropriate values to the message queues
 	attr.mq_flags = 0;
 	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(sensor_struct); //Change afterwards
@@ -33,8 +51,19 @@ int queue_init(void)
 	{
 		error_log("ERROR: mq_open() for log_sock queue; in queue_init() function");
 	}
+	return OK;
 }
 
+/**
+ * @brief - This function is used to enqueue the specified structure in the specified message queue
+ * as the parameter
+ * 
+ * @param mq - The message queue descriptor in which the data needs to be enqueued.
+ * @param data_send - The structure object consisting data. This can be obtained from functions such as:
+ * read_temp_data(), read_light_data(), read_error(), read_msg().
+ *	
+ * @param loglevel - This specifies the log level.
+ */
 void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel)
 {
 	if (loglevel & g_ll)
@@ -48,7 +77,12 @@ void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel)
 		}
 	}
 }
-
+/**
+ * @brief - This function dequeues the data from the specified message queue descriptor parameter.
+ * 
+ * @param mq - Message queue descriptor
+ * @return sensor_struct - The structure local onject in which the data received is stored.
+ */
 sensor_struct queue_receive(mqd_t mq)
 {
 	sensor_struct data_rcv;
@@ -61,6 +95,11 @@ sensor_struct queue_receive(mqd_t mq)
 	return data_rcv;
 }
 
+/**
+ * @brief - This function closes all the message queues.
+ * 
+ * @return err_t 
+ */
 err_t queues_close(void)
 {
 	if (mq_close(heartbeat_mq))
@@ -82,6 +121,11 @@ err_t queues_close(void)
 	return OK;
 }
 
+/**
+ * @brief - This function unlinks all the message queues.
+ * 
+ * @return err_t 
+ */
 err_t queues_unlink(void)
 {
 	if (mq_unlink(HEARTBEAT_QUEUE))

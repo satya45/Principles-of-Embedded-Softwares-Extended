@@ -1,5 +1,17 @@
+/**
+ * @file temp.h
+ * @author Siddhant Jajoo and Satya Mehta
+ * @brief Header file of temp.c
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #ifndef _TEMP_H
 #define _TEMP_H
+
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>

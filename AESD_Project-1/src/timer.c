@@ -1,5 +1,28 @@
+/**
+ * @file timer.c
+ * @author Siddhant Jajoo and Satya Mehta
+ * @brief All function related to timer have been defined in this file.
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
+
+
 #include "timer.h"
 
+
+/**
+ * @brief - This function creates and starts the respective timer.
+ * 
+ * @param timer_handle - This signifies which timer needs to be initialized.
+ * The values can be:   TIMER_TEMP
+ *                      TIMER_LIGHT
+ *                      TIMER_HB
+ * @return err_t - Error value (0 for success)
+ */
 err_t timer_init(uint8_t timer_handle)
 {
     if (timer_handle == TIMER_TEMP)
@@ -68,6 +91,11 @@ err_t timer_init(uint8_t timer_handle)
     return OK;
 }
 
+/**
+ * @brief - This function is invoked on timer expiration.
+ * 
+ * @param sigval - This parameter is passed in the timer_init function in their respective cases.
+ */
 void timer_handler(union sigval sv)
 {
     if (sv.sival_int == TIMER_TEMP)
@@ -92,3 +120,4 @@ void timer_handler(union sigval sv)
         printf("In Timer Handler: Heartbeat Timer fired.\n");
     }
 }
+

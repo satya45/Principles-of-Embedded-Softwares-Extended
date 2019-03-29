@@ -1,9 +1,24 @@
+/**
+ * @file logger.c
+ * @author Siddhant Jajoo
+ * @brief This file consists of the logger function which prints the data to the logfile.
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include "logger.h"
 
-void log_error(char *str, int errno)
-{
-}
 
+/**
+ * @brief - This function logs data to the textfile depending on the id field obtained from the structure sensor_struct
+ * 			upon dequeuing the data.
+ * 
+ * @param data_rcv - This is the local object of the structure sensor_struct. This is obtained from function queue_receive().
+  
+ */
 void log_data(sensor_struct data_rcv)
 {
 	switch (data_rcv.id)

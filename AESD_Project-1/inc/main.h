@@ -1,3 +1,14 @@
+/**
+ * @file main.h
+ * @author Siddhant Jajoo and Satya Mehta 
+ * @brief Header file for main.c
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #ifndef _MAIN_H
 #define _MAIN_H
 
@@ -13,6 +24,8 @@
 #define OK (0)
 #define FAIL (1)
 #define I2C_BUS ("/dev/i2c-2")
+
+//Timer initialization macros
 #define TIMER_TEMP (1)
 #define TIMER_LIGHT (2)
 #define TIMER_HB (3)
@@ -21,6 +34,8 @@
 //#define LIGHT_EVENT	(0X02)
 
 #define TEMP_UNIT (1) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
+
+//Heartbeat values corresponding to different threads 
 #define TEMP_HB (1)
 #define LIGHT_HB (2)
 #define LOGGER_HB (3)
@@ -40,6 +55,7 @@ pthread_mutex_t mutex_a;
 pthread_mutex_t mutex_b;
 pthread_mutex_t mutex_error;
 
+//Global Variables
 int i2c_open;
 char *filename;
 volatile uint8_t temp_timerflag;
@@ -50,6 +66,7 @@ volatile uint8_t socket_flag;
 
 //char *backup = BACKUP_FILENAME;
 
+//Macros for different events.
 #define TEMP_RCV_ID (1)
 #define LIGHT_RCV_ID (2)
 #define ERROR_RCV_ID (3)
@@ -57,8 +74,10 @@ volatile uint8_t socket_flag;
 #define SOCK_TEMP_RCV_ID (5)
 #define SOCK_LIGHT_RCV_ID (6)
 
+// Error number
 typedef uint32_t err_t;
 
+//Temperature sensor structure
 struct temp_struct
 {
 	float temp_c;
@@ -66,6 +85,7 @@ struct temp_struct
 	uint8_t logger_level;
 };
 
+//Light sensor structure
 struct light_struct
 {
 	float light;
@@ -73,6 +93,7 @@ struct light_struct
 	uint8_t logger_level;
 };
 
+//Error structure
 struct error_struct
 {
 	struct timespec data_time;
@@ -80,11 +101,13 @@ struct error_struct
 	char error_str[50];
 };
 
+//Message structure
 struct msg_struct
 {
 	char msg_str[50];
 };
 
+//Main sensor structure
 typedef struct
 {
 	uint8_t id;

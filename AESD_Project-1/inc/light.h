@@ -1,5 +1,17 @@
+/**
+ * @file light.h
+ * @author Siddhant Jajoo and Satya Mehta
+ * @brief Header file of light.c 
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #ifndef _LIGHT_H
 #define _LIGHT_H
+
 #include <stdio.h>
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
@@ -35,7 +47,7 @@
 #define INT_EN_MASK         0x10
 #define INT_DIS_MASK        0x00
 
-
+//Function Declarations
 err_t light_id(void);
 err_t write_command(uint8_t);
 uint16_t ADC_CH0(void);

@@ -1,5 +1,18 @@
+/**
+ * @file gpio.h
+ * @author Siddhant Jajoo aand Satya Mehta
+ * @brief Header file of gpio.c
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
+
 #ifndef _GPIO_H
 #define _GPIO_H
+
 #include "main.h"
 
 #define LED1 53
@@ -17,6 +30,7 @@
 #define GPIO55_V  "/sys/class/gpio/gpio55/value"
 #define GPIO56_V  "/sys/class/gpio/gpio53/value"
 
+//Function Declarations
 err_t gpio_init(uint8_t);
 err_t gpio_ctrl(char *, char *, uint8_t);
 #endif

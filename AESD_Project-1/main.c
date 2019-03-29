@@ -1,4 +1,17 @@
 
+/**
+ * @file main.c
+ * @author Siddhant Jajoo and Satya Mehta
+ * @brief This is a multithreaded C code which records temperature and light values at regular intervals
+ * of time using a synchronized I2C and sends it to the logger thread using message queues to log into a
+ * text file. A socket thread is also created to send data to a remote host on a socket request.  
+ * @version 0.1
+ * @date 2019-03-28
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 //#include <string.h>
 #include <pthread.h>
 #include <sched.h>
@@ -113,6 +126,15 @@ int main(int argc, char *argv[])
 	}
 }
 
+/**
+ * @brief - This thread records temperature from the sensor at regular intervals of time and sends the data
+ * 			to the logger thread using message queues.
+ * 			It also send data to the socket thread using message queues.
+ * 
+ * @param filename - This is the textfile name that is passed to the thread. This is obtained as a 
+ * 					command line argument.
+ * @return void* 
+ */
 void *temp_thread(void *filename)
 {
 	msg_log("In Temperature Thread.\n", DEBUG);
@@ -167,6 +189,14 @@ void *temp_thread(void *filename)
 	}
 }
 
+/**
+ * @brief - This thread records the lux value from the sensor at regular intervals of time and sends the 
+ * 			data to the logger file using message queues.
+ * 
+ * @param filename - This is the textfile name that is passed to the thread. This is obtained as a 
+ * 					command line argument.
+ * @return void* 
+ */
 void *light_thread(void *filename)
 {
 	msg_log("In light Thread.\n", DEBUG);
@@ -220,6 +250,14 @@ void *light_thread(void *filename)
 	}
 }
 
+/**
+ * @brief - This thread receives data from all the threads using message queues and prints the data to a 
+ * 			textfile.
+ * 
+ * @param filename - This is the textfile name that is passed to the thread. This is obtained as a 
+ * 					command line argument.
+ * @return void* 
+ */
 void *logger_thread(void *filename)
 {
 	msg_log("In logger Thread.\n", DEBUG);
@@ -230,6 +268,14 @@ void *logger_thread(void *filename)
 	}
 }
 
+/**
+ * @brief - This thread initializes the socket and waits for a connection to be established from a
+ * 			remote host. On socket connection it sends the requested data to the remote host.
+ * 
+ * @param filename - This is the textfile name that is passed to the thread. This is obtained as a 
+ * 					command line argument.
+ * @return void* 
+ */
 void *sock_thread(void *filename)
 {
 	msg_log("In socket Thread.\n", DEBUG);
@@ -245,6 +291,13 @@ void *sock_thread(void *filename)
 	}
 }
 
+/**
+ * @brief - Create 4 different threads.
+ * 
+ * @param filename - This is the textfile name that is passed to the thread. This is obtained as a 
+ * 					command line argument.
+ * @return err_t - Returns error value. (0 for success).
+ */
 err_t create_threads(char *filename)
 {
 	if (pthread_create(&my_thread[0],		   // pointer to thread descriptor
@@ -286,6 +339,11 @@ err_t create_threads(char *filename)
 	return OK;
 }
 
+/**
+ * @brief - This function initializes I2C.
+ * 
+ * @return err_t
+ */
 err_t i2c_init(void)
 {
 	if ((i2c_open = open(I2C_BUS, O_RDWR)) < 0)
@@ -294,6 +352,12 @@ err_t i2c_init(void)
 	}
 }
 
+/**
+ * @brief - This function reads the error values i.e errno and stores it in a local structure.
+ * 
+ * @param error_str - The error string that needs to be printed in the text file.
+ * @return sensor_struct 
+ */
 sensor_struct read_error(char *error_str)
 {
 	sensor_struct read_data;
@@ -318,6 +382,12 @@ sensor_struct read_error(char *error_str)
 	return read_data;
 }
 
+/**
+ * @brief - This function stores the string that needs to be printed in the text file in a structure.
+ * 
+ * @param msg_str - The string that needs to be printed in the text file.
+ * @return sensor_struct 
+ */
 sensor_struct read_msg(char *msg_str)
 {
 	sensor_struct read_data;
@@ -335,16 +405,39 @@ sensor_struct read_msg(char *msg_str)
 	return read_data;
 }
 
+/**
+ * @brief - This function sends the error string to be printed in the textfile to the logger thread via
+ * 			message queue and prints it in the textile. 
+ * 
+ * @param error_str - The error string that needs to be printed in the textfile.
+ */
 void error_log(char *error_str)
 {
 	queue_send(log_mq, read_error(error_str), INFO_DEBUG);
 }
 
+/**
+ * @brief - This function sends the message string to be printed in the textfile to the logger thread via
+ * 			message queue and prints it in the textile. 
+ * 
+ * @param str - The message string that needs to be printed in the textfile.
+ * @param loglevel - The loglevel of the message.
+ */
 void msg_log(char *str, uint8_t loglevel)
 {
 	queue_send(log_mq, read_msg(str), loglevel);
 }
 
+/**
+ * @brief - This function sends heartbeat to the main loop.
+ * 
+ * @param hb_value - This value specifies the heartbeat is from which thread. 
+ * The values can be : 	TEMP_HB
+ * 						LIGHT_HB
+ * 						LOGGER_HB
+ * 						SOCKET_HB
+ * 						CLEAR_HB
+ */
 void hb_send(uint8_t hb_value)
 {
 	ssize_t res;
@@ -356,6 +449,11 @@ void hb_send(uint8_t hb_value)
 	}
 }
 
+/**
+ * @brief - This function reads the value received from the messgae queue.
+ * 
+ * @return uint8_t - Returns the value signifying from which thread it has received the value.
+ */
 uint8_t hb_receive(void)
 {
 	ssize_t res;
@@ -367,6 +465,12 @@ uint8_t hb_receive(void)
 	}
 	return hb_rcv;
 }
+
+/**
+ * @brief - This function handles the action after receiving the value from the hb_receive() function.
+ * 
+ * @param hb_rcv - This value is returned from the hb_receive() function.
+ */
 
 void hb_handle(uint8_t hb_rcv)
 {
