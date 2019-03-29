@@ -39,14 +39,17 @@ void socket_listen()
 
 void socket_send(sensor_struct data_send)
 {
-    printf("BEFORE SOCKET SEND\n\n");
-    printf("%d\n", data_send.id);
-    fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_send.sensor_data.temp_data.data_time.tv_sec, data_send.sensor_data.temp_data.data_time.tv_nsec);
-    fprintf(stdout, "Value: %f.\n", data_send.sensor_data.temp_data.temp_c);
-    fprintf(stdout, "\n***********************************\n\n");
-    send(ser, (void *)&data_send, sizeof(sensor_struct), 0);
-    // float data = data_send.sensor_data.light_data.light;
-    // send(ser, (void *)&data, sizeof(sensor_struct), 0);
+    void socket_send(sensor_struct data_send)
+{
+    if(data_send.id == 5)
+    {
+        send(ser, (void *)&data_send.sensor_data.temp_data.temp_c, sizeof(sensor_struct), 0);
+    }
+    if(data_send.id == 6)
+    {
+        send(ser, (void *)&data_send.sensor_data.light_data.light, sizeof(sensor_struct), 0);
+    }
+}
 }
 
 int socket_recv(void)
