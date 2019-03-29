@@ -38,7 +38,6 @@ volatile static uint32_t temp_hb_value;
 volatile static uint32_t light_hb_value;
 volatile static uint32_t logger_hb_value;
 
-
 int main(int argc, char *argv[])
 {
 	if (argc != 3)
@@ -78,29 +77,17 @@ int main(int argc, char *argv[])
 		g_ll = ERROR;
 	}
 
+	//Initializing global variables
 	temp_timerflag = 0;
 	light_timerflag = 0;
 	main_exit = 0;
+
 	gpio_init(LED1);
 	srand(time(NULL));
 	sig_init();
 	queue_init();
 	i2c_init();
-
-	if (pthread_mutex_init(&mutex_a, NULL))
-	{
-		error_log("ERROR: pthread_mutex_init(mutex_a); mutex_a not created");
-	}
-
-	if (pthread_mutex_init(&mutex_error, NULL))
-	{
-		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
-	}
-
-	if (pthread_mutex_init(&mutex_b, NULL))
-	{
-		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
-	}
+	mutex_init();
 
 	if (remove(filename))
 	{
@@ -108,7 +95,7 @@ int main(int argc, char *argv[])
 	}
 
 	create_threads(filename);
-	
+
 	timer_init(TIMER_HB);
 
 	while (!main_exit)
@@ -116,14 +103,17 @@ int main(int argc, char *argv[])
 		hb_handle(hb_receive());
 	}
 
+	destroy_all();
+
 	for (int i = 0; i < 4; i++)
 	{
-		if (pthread_join(my_thread[i], NULL))
-		{
-			error_log("ERROR: pthread_join(); cannot join thread");
-			//Send termination signal.
-		}
+		pthread_join(my_thread[i], NULL);
+		//{
+		// 	error_log("ERROR: pthread_join(); cannot join thread");
+		// }
 	}
+
+	return OK;
 }
 
 /**
@@ -140,7 +130,7 @@ void *temp_thread(void *filename)
 	msg_log("In Temperature Thread.\n", DEBUG);
 	timer_init(TIMER_TEMP);
 	sensor_struct data_send;
-	
+
 	while (1)
 	{
 		if (temp_timerflag)
@@ -159,7 +149,7 @@ void *temp_thread(void *filename)
 			pthread_mutex_unlock(&mutex_b);
 			hb_send(TEMP_HB);
 		}
-		
+
 		pthread_mutex_lock(&mutex_b);
 		if (socket_flag & TC)
 		{
@@ -175,7 +165,7 @@ void *temp_thread(void *filename)
 		{
 			socket_flag &= (~TF);
 			queue_send(log_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_temp_data(2,SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG);
 		}
 		else if (socket_flag & TK)
 		{
@@ -183,7 +173,7 @@ void *temp_thread(void *filename)
 			//queue_send(sock_mq, data_send, INFO_DEBUG);
 			socket_flag &= (~TK);
 			queue_send(log_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_temp_data(1,SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(sock_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG);
 		}
 		pthread_mutex_unlock(&mutex_b);
 	}
@@ -208,12 +198,11 @@ void *light_thread(void *filename)
 	while (1)
 	{
 
-
 		if (light_timerflag)
 		{
 			ch0 = read_adc0();
-			printf("Channel 0 data %d\n",ch0);
-			if(ch0 > 75)
+			printf("Channel 0 data %d\n", ch0);
+			if (ch0 > 75)
 			{
 				gpio_ctrl(GPIO53, GPIO53_V, 1);
 			}
@@ -221,9 +210,9 @@ void *light_thread(void *filename)
 			{
 				gpio_ctrl(GPIO53, GPIO53_V, 0);
 			}
-		// 	ch1 = ADC_CH1();
-		// 	printf("Channel 0 data %d\n",ch1);
-			
+			// 	ch1 = ADC_CH1();
+			// 	printf("Channel 0 data %d\n",ch1);
+
 			pthread_mutex_lock(&mutex_b);
 			//printf("In main loop: Light timer event handled.\n");
 			//Insert Mutex lock here
@@ -237,7 +226,6 @@ void *light_thread(void *filename)
 			//Insert mutex Unlock here
 			pthread_mutex_unlock(&mutex_b);
 			hb_send(LIGHT_HB);
-
 		}
 		if (socket_flag & L)
 		{
@@ -246,7 +234,6 @@ void *light_thread(void *filename)
 			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG);
 			socket_flag &= (~L);
 		}
-		
 	}
 }
 
@@ -281,13 +268,12 @@ void *sock_thread(void *filename)
 	msg_log("In socket Thread.\n", DEBUG);
 	socket_init();
 	while (1)
-	{	
+	{
 		socket_listen();
 		handle_socket_req();
 		//pthread_mutex_lock(&mutex_b);
 		socket_send(queue_receive(sock_mq));
 		//pthread_mutex_unlock(&mutex_b);
-		
 	}
 }
 
@@ -350,6 +336,31 @@ err_t i2c_init(void)
 	{
 		error_log("ERROR: i2c_open(); in i2c_init() function");
 	}
+}
+
+/**
+ * @brief - This function initializes all the mutexes
+ * 
+ * @return err_t 
+ */
+err_t mutex_init(void)
+{
+	if (pthread_mutex_init(&mutex_a, NULL))
+	{
+		error_log("ERROR: pthread_mutex_init(mutex_a); mutex_a not created");
+	}
+
+	if (pthread_mutex_init(&mutex_b, NULL))
+	{
+		error_log("ERROR: pthread_mutex_init(mutex_b); mutex_b not created");
+	}
+
+	if (pthread_mutex_init(&mutex_error, NULL))
+	{
+		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
+	}
+
+	return OK;
 }
 
 /**
@@ -501,6 +512,19 @@ void hb_handle(uint8_t hb_rcv)
 	{
 		if (temp_hb_value == 0)
 		{
+			if (pthread_cancel(my_thread[0]))
+			{
+				error_log("ERROR: pthread_cancel(0); in hb_handle() function");
+			}
+
+			if (pthread_create(&my_thread[0],		   // pointer to thread descriptor
+							   (void *)&my_attributes, // use default attributes
+							   temp_thread,			   // thread function entry point
+							   (void *)0))			   // parameters to pass in
+			{
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
+				//Send Termination Signal
+			}
 			//handle if heartbeats not received
 		}
 		else
@@ -510,6 +534,19 @@ void hb_handle(uint8_t hb_rcv)
 
 		if (light_hb_value == 0)
 		{
+			if (pthread_cancel(my_thread[1]))
+			{
+				error_log("ERROR: pthread_cancel(1); in hb_handle() function");
+			}
+
+			if (pthread_create(&my_thread[1],		   // pointer to thread descriptor
+							   (void *)&my_attributes, // use default attributes
+							   light_thread,			   // thread function entry point
+							   (void *)0))			   // parameters to pass in
+			{
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
+				//Send Termination Signal
+			}
 			//handle if heartbeats not received
 		}
 		else
@@ -519,6 +556,19 @@ void hb_handle(uint8_t hb_rcv)
 
 		if (logger_hb_value == 0)
 		{
+			if (pthread_cancel(my_thread[2]))
+			{
+				error_log("ERROR: pthread_cancel(2); in hb_handle() function");
+			}
+
+			if (pthread_create(&my_thread[2],		   // pointer to thread descriptor
+							   (void *)&my_attributes, // use default attributes
+							   logger_thread,			   // thread function entry point
+							   (void *)0))			   // parameters to pass in
+			{
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
+				//Send Termination Signal
+			}
 			//handle if heartbeats not received
 		}
 		else
@@ -530,4 +580,81 @@ void hb_handle(uint8_t hb_rcv)
 		break;
 	}
 	}
+}
+
+/**
+ * @brief - Closes the i2c file descriptor
+ * 
+ * @return err_t 
+ */
+err_t i2c_close(void)
+{
+	if (close(i2c_open))
+	{
+		error_log("ERROR: close(); in i2c_close");
+	}
+}
+
+/**
+ * @brief - This function destroys all the mutexes created at the start.
+ * 
+ * @return err_t 
+ */
+err_t mutex_destroy(void)
+{
+	if (pthread_mutex_destroy(&mutex_a))
+	{
+		error_log("ERROR: pthread_mutex_destroy(mutex_a); cannot destroy mutex_a");
+	}
+
+	if (pthread_mutex_destroy(&mutex_b))
+	{
+		error_log("ERROR: pthread_mutex_destroy(mutex_b); cannot destroy mutex_b");
+	}
+
+	if (pthread_mutex_destroy(&mutex_error))
+	{
+		error_log("ERROR: pthread_mutex_destroy(mutex_error); cannot destroy mutex_error");
+	}
+
+	return OK;
+}
+
+err_t thread_destroy(void)
+{
+	if (pthread_cancel(my_thread[0]))
+	{
+		error_log("ERROR: pthread_cancel(0); in thread_destroy() function");
+	}
+
+	if (pthread_cancel(my_thread[1]))
+	{
+		error_log("ERROR: pthread_cancel(1); in thread_destroy() function");
+	}
+
+	if (pthread_cancel(my_thread[2]))
+	{
+		error_log("ERROR: pthread_cancel(2); in thread_destroy() function");
+	}
+
+	if (pthread_cancel(my_thread[3]))
+	{
+		error_log("ERROR: pthread_cancel(3); in thread_destroy() function");
+	}
+}
+
+err_t destroy_all(void)
+{
+	timer_del();
+	mutex_destroy();
+	queues_close();
+	queues_unlink();
+	printf("\nTerminating due to signal");
+	i2c_close();
+
+	//cancel logger thread after printing the above msg.
+	thread_destroy();
+
+	//The below command should come after printing terminating in the text file.
+	//exit(EXIT_SUCCESS);
 }

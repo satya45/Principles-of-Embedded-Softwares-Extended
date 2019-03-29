@@ -46,25 +46,8 @@ void signal_handler(int signo, siginfo_t *info, void *extra)
 {
 	if (signo == 2)
 	{
-		queues_close();
-		queues_unlink();
-
-		if (pthread_mutex_destroy(&mutex_a))
-		{
-			error_log("ERROR: pthread_mutex_destroy(mutex_a); cannot destroy mutex_a");
-		}
-
-		if (pthread_mutex_destroy(&mutex_error))
-		{
-			error_log("ERROR: pthread_mutex_destroy(mutex_error); cannot destroy mutex_error");
-		}
-
-		//delete timers
-
+		//setting flag to exit the while loop in main in order to execute the destroy_all() function.
 		main_exit = 1;
-		printf("\nTerminating due to signal number = %d.\n", signo);
-		//The below command should come after printing terminating in the text file.
-		exit(EXIT_SUCCESS);
 	}
 	if (signo == 13)
 	{

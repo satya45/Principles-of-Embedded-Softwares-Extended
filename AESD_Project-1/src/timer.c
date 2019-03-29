@@ -9,10 +9,7 @@
  * 
  */
 
-
-
 #include "timer.h"
-
 
 /**
  * @brief - This function creates and starts the respective timer.
@@ -27,7 +24,6 @@ err_t timer_init(uint8_t timer_handle)
 {
     if (timer_handle == TIMER_TEMP)
     {
-        timer_t timeout_temp;
         struct itimerspec trigger_temp;
         struct sigevent sev_temp;
         memset(&sev_temp, 0, sizeof(struct sigevent));
@@ -48,7 +44,6 @@ err_t timer_init(uint8_t timer_handle)
     }
     else if (timer_handle == TIMER_LIGHT)
     {
-        timer_t timeout_light;
         struct itimerspec trigger_light;
         struct sigevent sev_light;
         memset(&sev_light, 0, sizeof(struct sigevent));
@@ -69,7 +64,6 @@ err_t timer_init(uint8_t timer_handle)
     }
     else if (timer_handle == TIMER_HB)
     {
-        timer_t timeout_hb;
         struct itimerspec trigger_hb;
         struct sigevent sev_hb;
         memset(&sev_hb, 0, sizeof(struct sigevent));
@@ -121,3 +115,27 @@ void timer_handler(union sigval sv)
     }
 }
 
+/**
+ * @brief - This function deletes all the timers created.
+ * 
+ * @return err_t 
+ */
+err_t timer_del(void)
+{
+    if (timer_delete(timeout_temp))
+    {
+        error_log("ERROR: timer_delete(temp); in timer_del() function");
+    }
+
+    if (timer_delete(timeout_light))
+    {
+        error_log("ERROR: timer_delete(light); in timer_del() function");
+    }
+
+    if (timer_delete(timeout_hb))
+    {
+        error_log("ERROR: timer_delete(hb); in timer_del() function");
+    }
+
+    return OK;
+}

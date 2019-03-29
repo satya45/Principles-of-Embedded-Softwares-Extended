@@ -22,8 +22,14 @@
 #define HB_INTERVAL_SEC (10)
 #define HB_INTERVAL_NSEC (0)
 
+
+timer_t timeout_temp;
+timer_t timeout_light;
+timer_t timeout_hb;
+
 //Function declarations
 err_t timer_init(uint8_t timer_number);
 void timer_handler(union sigval sv);
+err_t timer_del(void);
 
 #endif

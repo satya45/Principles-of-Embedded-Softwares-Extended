@@ -135,5 +135,11 @@ void msg_log(char *msg_str, uint8_t loglevel);
 void hb_send(uint8_t hb_value);
 uint8_t hb_receive(void);
 void hb_handle(uint8_t hb_rcv);
+err_t mutex_init(void);
+err_t mutex_destroy(void);
+err_t i2c_close(void);
+err_t thread_destroy(void);
+err_t destroy_all(void);
+
 
 #endif

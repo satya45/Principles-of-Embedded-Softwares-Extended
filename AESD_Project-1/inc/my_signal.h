@@ -19,6 +19,7 @@
 #include <signal.h>
 #include "queue.h"
 #include "main.h"
+#include "timer.h"
 
 //Function Declarations
 err_t sig_init(void);
