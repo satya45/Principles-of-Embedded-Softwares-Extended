@@ -11,13 +11,21 @@
 #include "temp.h"
 #include "gpio.h"
 
+
+/**
+ * @brief Read Temperature
+ * 
+ * @param temp_unit 
+ * @param id 
+ * @return sensor_struct 
+ */
 sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
 {
     int temp;
     char temp_buff[2];
     int temp_data[2];
     sensor_struct read_data;
-    write_pointer(TEMP_REG);
+    write_pointer(TEMP_REG); //select temperature register
 
     if (read(i2c_open, temp_buff, 2) != 2)
     {
@@ -32,17 +40,23 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
         error_log("ERROR: clock_gettime(); in read_temp_data() function");
     }
     read_data.sensor_data.temp_data.temp_c = (float)((temp_data[0] << 8 | temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
-
     if (temp_unit == 1)
     {
-        read_data.sensor_data.temp_data.temp_c = read_data.sensor_data.temp_data.temp_c + 273;
+        read_data.sensor_data.temp_data.temp_c = read_data.sensor_data.temp_data.temp_c + 273; //Kelvin Computations
     }
     else if (temp_unit == 2)
     {
-        read_data.sensor_data.temp_data.temp_c = ((9.0 / 5.0) * (read_data.sensor_data.temp_data.temp_c)) + 32;
+        read_data.sensor_data.temp_data.temp_c = ((9.0 / 5.0) * (read_data.sensor_data.temp_data.temp_c)) + 32; //Farhenheit calculations
     }
     return read_data;
 }
+
+/**
+ * @brief Can be used to read any temperature register
+ * 
+ * @param reg 
+ * @return err_t 
+ */
 
 err_t read_temp_reg(uint8_t reg)
 {
@@ -56,6 +70,11 @@ err_t read_temp_reg(uint8_t reg)
     write_pointer(TEMP_REG);
     return 0;
 }
+/**
+ * @brief Set Shutdown mode
+ * 
+ * @return err_t 
+ */
 
 err_t shutdown_mode(void)
 {
@@ -75,6 +94,13 @@ err_t shutdown_mode(void)
     return 0;
 }
 
+/**
+ * @brief Write to the tlow register
+ * inside the sensor
+ * @param data 
+ * @return err_t 
+ */
+
 err_t write_tlow(uint16_t data)
 {
     int rc;
@@ -92,6 +118,13 @@ err_t write_tlow(uint16_t data)
     }
     write_pointer(TEMP_REG);
 }
+
+/**
+ * @brief Wrte to thigh register
+ *inside the sensor.
+ * @param data 
+ * @return err_t 
+ */
 err_t write_thigh(uint16_t data)
 {
     int rc;
@@ -110,6 +143,13 @@ err_t write_thigh(uint16_t data)
     write_pointer(TEMP_REG);
 }
 
+
+/**
+ * @brief Write to pointer register avaialable inside the sensor.
+ * 
+ * @param reg 
+ * @return err_t 
+ */
 err_t write_pointer(uint8_t reg)
 {
     int rc;

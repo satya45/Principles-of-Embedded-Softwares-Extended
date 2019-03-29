@@ -1,5 +1,18 @@
+/**
+ * @file sockets.c
+ * @Satya Mehta and Siddhant Jajoo
+ * @Functions supporting sockets initialization.
+ * @date 2019-03-22
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
 #include "sockets.h"
 
+
+/**
+ * @Initializes socket and opens port 3124 
+ */
 void socket_init(void)
 {
     port = PORT;
@@ -23,6 +36,11 @@ void socket_init(void)
     }
 }
 
+
+/**
+ * @brief Used to listen on port again
+ * 
+ */
 void socket_listen()
 {
     if (listen(serv, 5) == -1)
@@ -36,10 +54,13 @@ void socket_listen()
     }
     printf("Connected\n");
 }
+/**
+ * @brief Send data via socket  depending on light and temperature id's.
+ * 
+ * @param data_send 
+ */
 
 void socket_send(sensor_struct data_send)
-{
-    void socket_send(sensor_struct data_send)
 {
     if(data_send.id == 5)
     {
@@ -50,7 +71,12 @@ void socket_send(sensor_struct data_send)
         send(ser, (void *)&data_send.sensor_data.light_data.light, sizeof(sensor_struct), 0);
     }
 }
-}
+
+/**
+ * @Read data from the socket request
+ * 
+ * @return int 
+ */
 
 int socket_recv(void)
 {
@@ -66,6 +92,11 @@ int socket_recv(void)
     fflush(stdout);
     return data;
 }
+/**
+ * @brief Calls socket receive function and sets the flag based on 
+ * the request received from the remote machine
+ * 
+ */
 
 void handle_socket_req()
 {
