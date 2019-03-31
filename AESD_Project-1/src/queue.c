@@ -24,33 +24,37 @@ int queue_init(void)
 
 	//Assigning the appropriate values to the message queues
 	attr.mq_flags = 0;
-	attr.mq_maxmsg = 10;
+	attr.mq_maxmsg = 20;
 	attr.mq_msgsize = sizeof(sensor_struct); //Change afterwards
 	attr.mq_curmsgs = 0;
 
 	heartbeat_mq = mq_open(HEARTBEAT_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (heartbeat_mq == -1)
 	{
-		error_log("ERROR: mq_open() for heartbeat queue; in queue_init() function", ERROR_DEBUG, P2);
+		perror("Heartbeat message queue initialization failed.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	log_mq = mq_open(LOG_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (log_mq == -1)
 	{
-		error_log("ERROR: mq_open() for logger queue; in queue_init() function", ERROR_DEBUG, P2);
+		perror("Logger message queue initialization failed.\n");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		exit(EXIT_FAILURE);
 	}
 
 	sock_mq = mq_open(SOCK_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (sock_mq == -1)
 	{
-		error_log("ERROR: mq_open() for socket queue; in queue_init() function", ERROR_DEBUG, P2);
+		perror("Socket message queue initialization failed.\n");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		exit(EXIT_FAILURE);
 	}
 
-	log_sock_mq = mq_open(LOG_SOCK_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
-	if (log_sock_mq == -1)
-	{
-		error_log("ERROR: mq_open() for log_sock queue; in queue_init() function", ERROR_DEBUG, P2);
-	}
 	return OK;
 }
 
@@ -114,10 +118,6 @@ err_t queues_close(void)
 	{
 		error_log("ERROR: mq_close(socket); in queues_close() function", ERROR_DEBUG, P2);
 	}
-	if (mq_close(log_sock_mq))
-	{
-		error_log("ERROR: mq_close(logger_socket); in queues_close() function", ERROR_DEBUG, P2);
-	}
 	return OK;
 }
 
@@ -141,10 +141,5 @@ err_t queues_unlink(void)
 	if (mq_unlink(SOCK_QUEUE))
 	{
 		error_log("ERROR: mq_unlink(socket); in queues_unlink() function", ERROR_DEBUG, P2);
-	}
-
-	if (mq_unlink(LOG_SOCK_QUEUE))
-	{
-		error_log("ERROR: mq_unlink(logger_socket); in queues_unlink() function", ERROR_DEBUG, P2);
 	}
 }

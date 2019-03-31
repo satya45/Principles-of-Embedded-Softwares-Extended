@@ -81,25 +81,63 @@ int main(int argc, char *argv[])
 	temp_timerflag = 0;
 	light_timerflag = 0;
 	main_exit = 0;
+	err_t res;
 
 	srand(time(NULL));
+
+	//Initializing queues
+	res = queue_init();
+	if (!res)
+	{
+		msg_log("BIST: Queue initialization successful.\n", DEBUG, P0);
+	}
+
+	//Initializing Signal handler
+	res = sig_init();
+	if (!res)
+	{
+		msg_log("Signal initialization successful.\n", DEBUG, P0);
+	}
+
+	//Initializing GPIOs LEDs
 	gpio_init(LED1);
 	gpio_init(LED2);
 	gpio_init(LED3);
 	gpio_init(LED4);
-	sig_init();
-	queue_init();
-	i2c_init();
-	mutex_init();
-	printf("Before light id\n");
 
+	//Initializing I2C
+	res = i2c_init();
+	if (!res)
+	{
+		msg_log("BIST: I2C initialization successful.\n", DEBUG, P0);
+	}
+
+	/********************************Temperature Sensor BIST Remaining*******************************/
+
+	if ((res = light_id()) == 0x50)
+	{
+		msg_log("BIST: Light Sensor Working.\n", DEBUG, P0);
+	}
+	//Initializing Mutexes
+	res = mutex_init();
+	if (!res)
+	{
+		msg_log("BIST: Mutex initialization successful.\n", DEBUG, P0);
+	}
+	// printf("Hello filed");
+	//Deleting previous logfile
 	if (remove(filename))
 	{
 		error_log("ERROR: remove(); cannot delete log file", ERROR_DEBUG, P2);
 	}
+	//Creating threads
+	res = create_threads(filename);
+	if (!res)
+	{//
+		msg_log("BIST: Thread Creation successful.\n", DEBUG, P0);
+	}
 
-	create_threads(filename);
-
+	//Initializing Timer
 	timer_init(TIMER_HB);
 
 	msg_log("Reached main while loop.\n", DEBUG, P0);
@@ -136,7 +174,14 @@ void *temp_thread(void *filename)
 	msg_log("Entered Temperature Thread.\n", DEBUG, P0);
 	timer_init(TIMER_TEMP);
 	//sensor_struct data_send;
-
+	msg_log("Entered Temperature Thread.\n", DEBUG, P0);
+	timer_init(TIMER_TEMP);
+	uint16_t rcv;
+	rcv = read_config();
+	printf("Before config write %x\n", rcv);
+	// write_config(CONFIG_DEFAULT);
+	// rcv = read_temp_reg(CONFIG_REG);
+	// printf("After config write %x\n", rcv);
 	while (1)
 	{
 		usleep(1);
@@ -205,7 +250,7 @@ void *light_thread(void *filename)
 	//sensor_struct data_send;
 	uint16_t ch0, ch1;
 	read_light_data(LIGHT_RCV_ID);
-	write_int_th(0x60,1);
+	write_int_th(0x60, 1);
 	uint16_t th = read_int_th(1);
 	printf("Threshold read %x\n", th);
 	write_int_ctrl(0x00);
@@ -215,7 +260,7 @@ void *light_thread(void *filename)
 	while (1)
 	{
 		int rcv = gpio_poll();
-		if(rcv == 0)
+		if (rcv == 0)
 		{
 			write_command(0x40);
 		}
@@ -318,8 +363,18 @@ err_t create_threads(char *filename)
 					   (void *)0))			   // parameters to pass in
 	{
 
-		error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created", ERROR_DEBUG, P2);
-		//Send Termination Signal
+		perror("ERROR: pthread_create(); in create_threads function, temp_thread not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		pthread_mutex_destroy(&mutex_b);
+		pthread_mutex_destroy(&mutex_error);
+		exit(EXIT_FAILURE);
 	}
 
 	if (pthread_create(&my_thread[1],		   // pointer to thread descriptor
@@ -328,7 +383,19 @@ err_t create_threads(char *filename)
 					   (void *)0))			   // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, light_thread not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_create(); in create_threads function, light_thread not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		pthread_mutex_destroy(&mutex_b);
+		pthread_mutex_destroy(&mutex_error);
+		pthread_cancel(my_thread[0]);
+		exit(EXIT_FAILURE);
 	}
 
 	if (pthread_create(&my_thread[2],		   // pointer to thread descriptor
@@ -337,15 +404,43 @@ err_t create_threads(char *filename)
 					   (void *)filename))	  // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, logger_thread not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_create(); in create_threads function, logger_thread not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		pthread_mutex_destroy(&mutex_b);
+		pthread_mutex_destroy(&mutex_error);
+		pthread_cancel(my_thread[0]);
+		pthread_cancel(my_thread[1]);
+		exit(EXIT_FAILURE);
 	}
+
 	if (pthread_create(&my_thread[3],		   // pointer to thread descriptor
 					   (void *)&my_attributes, // use default attributes
 					   sock_thread,			   // thread function entry point
 					   (void *)filename))	  // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, sock_thread not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_create(); in create_threads function, logger_thread not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		pthread_mutex_destroy(&mutex_b);
+		pthread_mutex_destroy(&mutex_error);
+		pthread_cancel(my_thread[0]);
+		pthread_cancel(my_thread[1]);
+		pthread_cancel(my_thread[2]);
+		exit(EXIT_FAILURE);
 	}
 
 	return OK;
@@ -360,8 +455,16 @@ err_t i2c_init(void)
 {
 	if ((i2c_open = open(I2C_BUS, O_RDWR)) < 0)
 	{
-		error_log("ERROR: i2c_open(); in i2c_init() function", ERROR_DEBUG, P2);
+		perror("ERROR: i2c_open(); in i2c_init() function");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		exit(EXIT_FAILURE);
 	}
+	return OK;
 }
 
 /**
@@ -373,17 +476,44 @@ err_t mutex_init(void)
 {
 	if (pthread_mutex_init(&mutex_a, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_a); mutex_a not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_mutex_init(mutex_a); mutex_a not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		exit(EXIT_FAILURE);
 	}
 
 	if (pthread_mutex_init(&mutex_b, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_b); mutex_b not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_mutex_init(mutex_b); mutex_b not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		exit(EXIT_FAILURE);
 	}
 
 	if (pthread_mutex_init(&mutex_error, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created", ERROR_DEBUG, P2);
+		perror("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		close(i2c_open);
+		pthread_mutex_destroy(&mutex_a);
+		pthread_mutex_destroy(&mutex_b);
+		exit(EXIT_FAILURE);
 	}
 
 	return OK;

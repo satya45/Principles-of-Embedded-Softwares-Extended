@@ -52,7 +52,7 @@
 #define INT_DIS_MASK        0x00
 
 //Function Declarations
-err_t light_id(void);
+uint8_t light_id(void);
 err_t write_command(uint8_t);
 uint16_t ADC_CH0(void);
 uint16_t ADC_CH1(void); 

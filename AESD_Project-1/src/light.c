@@ -54,7 +54,7 @@ sensor_struct read_light_data(uint8_t id)
  * 
  * @return err_t 
  */
-err_t light_id(void)
+uint8_t light_id(void)
 {
     printf("Inside light id\n\n");
     if (ioctl(i2c_open, I2C_SLAVE, LIGHT_ADDR) < 0) 
@@ -68,13 +68,13 @@ err_t light_id(void)
        error_log("ERROR: write(); in light_id() function", ERROR_DEBUG, P2);
     }
     write_command(ID_REG);
-    char id;
+    uint8_t id;
     if (read(i2c_open,&id,1) != 1) 
     {
        error_log("ERROR: read(); in light_id() function", ERROR_DEBUG, P2);
     }
     printf("Light Id: %x\n", (int)id);
-    return 0;
+    return id;
 }
 
 /**

@@ -10,7 +10,6 @@
  * 
  */
 
-
 #include "my_signal.h"
 
 /**
@@ -25,12 +24,29 @@ err_t sig_init()
 	send_sig.sa_sigaction = &signal_handler;
 	if (sigaction(SIGINT, &send_sig, NULL))
 	{
-		error_log("ERROR: sigaction(); in sig_init() function", ERROR_DEBUG, P2);
+		perror("ERROR: sigaction(); in sig_init() function");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		exit(EXIT_FAILURE);
+
 	}
 	if (sigaction(SIGPIPE, &send_sig, NULL))
 	{
-		error_log("ERROR: sigaction(); in sig_init() SIGPIPE function", ERROR_DEBUG, P2);
+		perror("ERROR: sigaction(); in sig_init() SIGPIPE function");
+		mq_close(heartbeat_mq);
+		mq_unlink(HEARTBEAT_QUEUE);
+		mq_close(log_mq);
+		mq_unlink(LOG_QUEUE);
+		mq_close(sock_mq);
+		mq_unlink(SOCK_QUEUE);
+		exit(EXIT_FAILURE);
 	}
+
+	return OK;
 }
 
 /**
