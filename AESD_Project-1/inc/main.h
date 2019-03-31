@@ -27,6 +27,7 @@
 #define OK (0)
 #define FAIL (1)
 #define I2C_BUS ("/dev/i2c-2")
+//#define I2C_BUS ("/dev/myi2c_char")
 
 //Timer initialization macros
 #define TIMER_TEMP (1)
@@ -36,7 +37,7 @@
 //#define TEMP_EVENT	(0x01)
 //#define LIGHT_EVENT	(0X02)
 
-#define TEMP_UNIT (2) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
+#define TEMP_UNIT (0) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
 
 //Heartbeat values corresponding to different threads 
 #define TEMP_HB (1)

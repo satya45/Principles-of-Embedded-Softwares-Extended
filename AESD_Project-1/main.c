@@ -82,22 +82,9 @@ int main(int argc, char *argv[])
 	light_timerflag = 0;
 	main_exit = 0;
 	err_t res;
-
+	uint16_t rcv;
 	srand(time(NULL));
 
-	//Initializing queues
-	res = queue_init();
-	if (!res)
-	{
-		msg_log("BIST: Queue initialization successful.\n", DEBUG, P0);
-	}
-
-	//Initializing Signal handler
-	res = sig_init();
-	if (!res)
-	{
-		msg_log("Signal initialization successful.\n", DEBUG, P0);
-	}
 
 	//Initializing GPIOs LEDs
 	gpio_init(LED1);
@@ -105,24 +92,67 @@ int main(int argc, char *argv[])
 	gpio_init(LED3);
 	gpio_init(LED4);
 
+	//Initializing queues
+	res = queue_init();
+	if (!res)
+	{
+		msg_log("BIST: Queue initialization successful.\n", DEBUG, P0);
+	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
+	}
+	
+	//Initializing Signal handler
+	res = sig_init();
+	if (!res)
+	{
+		msg_log("Signal initialization successful.\n", DEBUG, P0);
+	}
 	//Initializing I2C
 	res = i2c_init();
 	if (!res)
 	{
 		msg_log("BIST: I2C initialization successful.\n", DEBUG, P0);
+		gpio_ctrl(GPIO53, GPIO53_V, 0);
+	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
 	}
 
+	write_thigh(24);
+	rcv = read_temp_reg(THIGH_REG);
+	if(rcv == 0x180)
+	{
+		msg_log("BIST: Temperature Sensor Working\n", DEBUG, P0);
+		gpio_ctrl(GPIO53, GPIO53_V, 0);
+	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
+	}
 	/********************************Temperature Sensor BIST Remaining*******************************/
 
 	if ((res = light_id()) == 0x50)
 	{
 		msg_log("BIST: Light Sensor Working.\n", DEBUG, P0);
 	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
+	}
+
 	//Initializing Mutexes
 	res = mutex_init();
 	if (!res)
 	{
 		msg_log("BIST: Mutex initialization successful.\n", DEBUG, P0);
+	}
+
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
 	}
 	// printf("Hello filed");
 	//Deleting previous logfile
@@ -130,11 +160,20 @@ int main(int argc, char *argv[])
 	{
 		error_log("ERROR: remove(); cannot delete log file", ERROR_DEBUG, P2);
 	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
+	}
 	//Creating threads
 	res = create_threads(filename);
 	if (!res)
-	{//
+	{
 		msg_log("BIST: Thread Creation successful.\n", DEBUG, P0);
+		gpio_ctrl(GPIO53, GPIO53_V, 0);
+	}
+	else
+	{
+		gpio_ctrl(GPIO53, GPIO53_V, 1);
 	}
 
 	//Initializing Timer
@@ -177,14 +216,17 @@ void *temp_thread(void *filename)
 	msg_log("Entered Temperature Thread.\n", DEBUG, P0);
 	timer_init(TIMER_TEMP);
 	uint16_t rcv;
+	write_thigh(23);
+	write_tlow(22);
 	rcv = read_config();
-	printf("Before config write %x\n", rcv);
-	// write_config(CONFIG_DEFAULT);
-	// rcv = read_temp_reg(CONFIG_REG);
-	// printf("After config write %x\n", rcv);
+	printf("Config value %x\n", rcv);
+	rcv = read_temp_reg(THIGH_REG);
+	printf("Thigh value %x\n", rcv);
+	rcv = read_temp_reg(TLOW_REG);
+	printf("Tlow value %x\n", rcv);
 	while (1)
 	{
-		usleep(1);
+		usleep(10);
 		if (temp_timerflag)
 		{
 			pthread_mutex_lock(&mutex_b);
@@ -256,7 +298,6 @@ void *light_thread(void *filename)
 	write_int_ctrl(0x00);
 	write_int_ctrl(0x11);
 	read_light_reg(INT_CTRL);
-
 	while (1)
 	{
 		int rcv = gpio_poll();
@@ -298,6 +339,13 @@ void *light_thread(void *filename)
 		if (socket_flag & L)
 		{
 			socket_flag &= (~L);
+			queue_send(log_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
+			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
+			msg_log("Light socket request event handled", DEBUG, P0);
+		}
+		if (socket_flag & STATE)
+		{
+			socket_flag &= (~STATE);
 			queue_send(log_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
 			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
 			msg_log("Light socket request event handled", DEBUG, P0);

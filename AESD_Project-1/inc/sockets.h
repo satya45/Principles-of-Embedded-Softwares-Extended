@@ -29,7 +29,7 @@
 #define TF          0x04
 #define TK          0x08
 #define L           0x10
-#define TCL         0x12
+#define STATE       0x12
 #define TFL         0x14
 #define TKL         0x18     
 

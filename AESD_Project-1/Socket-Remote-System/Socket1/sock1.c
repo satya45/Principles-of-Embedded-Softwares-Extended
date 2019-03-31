@@ -27,7 +27,7 @@ Referred from:- http://www.it.uom.gr/teaching/distrubutedSite/dsIdaLiu/labs/lab2
 
 int len;
 struct sockaddr_in client_addr;
-char *serv_host = "128.138.189.126";
+char *serv_host = "192.168.0.41";
 struct hostent *hptr;
 int buff_size = 0;
 int client_fd, client_f, clilen, port;
@@ -73,6 +73,12 @@ typedef struct
 	} sensor_data;
 
 } sensor_struct;
+
+struct sock_send
+{
+    uint8_t id;
+    float data;
+};
 
 void signal_handler(int signo, siginfo_t *info, void *extra)
 {
@@ -161,87 +167,87 @@ void socket_request(void)
 	}
 }
 
-void log_data(sensor_struct data_rcv)
+void log_data(struct sock_send data_rcv)
 {
 	printf("%d\n", data_rcv.id);
-	printf("%f", data_rcv.sensor_data.temp_data.temp_c);
+	printf("%f", data_rcv.data);
 	switch (data_rcv.id)
 	{
-	case TEMP_RCV_ID:
-	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout,"DATA RECEIVED\n");
-		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
-		fprintf(stdout, "\n***********************************\n\n");
-		fprintf(logfile,"DATA RECEIVED\n");
-		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
-		fprintf(logfile, "\n***********************************\n\n");
-		break;
-	}
+	// case TEMP_RCV_ID:
+	// {
+	// 	FILE *logfile = fopen(filename, "a");
+	// 	fprintf(stdout,"DATA RECEIVED\n");
+	// 	fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
+	// 	fprintf(stdout, "In logger thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+	// 	fprintf(stdout, "\n***********************************\n\n");
+	// 	fprintf(logfile,"DATA RECEIVED\n");
+	// 	fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
+	// 	fprintf(logfile, "In logger Thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+	// 	fprintf(logfile, "\n***********************************\n\n");
+	// 	break;
+	// }
 
-	case LIGHT_RCV_ID:
-	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout,"DATA RECEIVED\n");
-		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(stdout, "\n***********************************\n\n");
-		fprintf(logfile,"DATA RECEIVED\n");
-		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(logfile, "\n***********************************\n\n");
-		fclose(logfile);
-		break;
-	}
+	// case LIGHT_RCV_ID:
+	// {
+	// 	FILE *logfile = fopen(filename, "a");
+	// 	fprintf(stdout,"DATA RECEIVED\n");
+	// 	fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
+	// 	fprintf(stdout, "In logger thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+	// 	fprintf(stdout, "\n***********************************\n\n");
+	// 	fprintf(logfile,"DATA RECEIVED\n");
+	// 	fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
+	// 	fprintf(logfile, "In logger Thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+	// 	fprintf(logfile, "\n***********************************\n\n");
+	// 	fclose(logfile);
+	// 	break;
+	// }
 
-	case ERROR_RCV_ID:
-	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout,"DATA RECEIVED\n");
-		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.error_data.data_time.tv_sec, data_rcv.sensor_data.error_data.data_time.tv_nsec);
-		fprintf(stdout, "%s.\n", data_rcv.sensor_data.error_data.error_str);
-		fprintf(stdout, "%s.\n", strerror(data_rcv.sensor_data.error_data.error_value));
-		fprintf(stdout, "\n***********************************\n\n");
-		fprintf(logfile,"DATA RECEIVED\n");
-		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.error_data.data_time.tv_sec, data_rcv.sensor_data.error_data.data_time.tv_nsec);
-		fprintf(logfile, "%s.\n", data_rcv.sensor_data.error_data.error_str);
-		fprintf(logfile, "%s.\n", strerror(data_rcv.sensor_data.error_data.error_value));
-		fprintf(logfile, "\n***********************************\n\n");
-		fclose(logfile);
-		break;
-	}
+	// case ERROR_RCV_ID:
+	// {
+	// 	FILE *logfile = fopen(filename, "a");
+	// 	fprintf(stdout,"DATA RECEIVED\n");
+	// 	fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.error_data.data_time.tv_sec, data_rcv.sensor_data.error_data.data_time.tv_nsec);
+	// 	fprintf(stdout, "%s.\n", data_rcv.sensor_data.error_data.error_str);
+	// 	fprintf(stdout, "%s.\n", strerror(data_rcv.sensor_data.error_data.error_value));
+	// 	fprintf(stdout, "\n***********************************\n\n");
+	// 	fprintf(logfile,"DATA RECEIVED\n");
+	// 	fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.error_data.data_time.tv_sec, data_rcv.sensor_data.error_data.data_time.tv_nsec);
+	// 	fprintf(logfile, "%s.\n", data_rcv.sensor_data.error_data.error_str);
+	// 	fprintf(logfile, "%s.\n", strerror(data_rcv.sensor_data.error_data.error_value));
+	// 	fprintf(logfile, "\n***********************************\n\n");
+	// 	fclose(logfile);
+	// 	break;
+	// }
 
-	case MSG_RCV_ID:
-	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout,"DATA RECEIVED\n");
-		fprintf(stdout, "%s", data_rcv.sensor_data.msg_data.msg_str);
+	// case MSG_RCV_ID:
+	// // {
+	// // 	FILE *logfile = fopen(filename, "a");
+	// // 	fprintf(stdout,"DATA RECEIVED\n");
+	// // 	fprintf(stdout, "%s", data_rcv.sensor_data.msg_data.msg_str);
 
-		fprintf(logfile,"DATA RECEIVED\n");
-		fprintf(logfile, "%s", data_rcv.sensor_data.msg_data.msg_str);
+	// // 	fprintf(logfile,"DATA RECEIVED\n");
+	// // 	fprintf(logfile, "%s", data_rcv.sensor_data.msg_data.msg_str);
 
-		fclose(logfile);
-		break;
-	}
+	// // 	fclose(logfile);
+	// 	break;
+	// }
 	case SOCK_TEMP_RCV_ID:
 	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout,"Temperature %f.\n", data_rcv.sensor_data.temp_data.temp_c);
-		fprintf(logfile,"Temperature %f.\n", data_rcv.sensor_data.temp_data.temp_c);
-		fprintf(logfile, "\n***********************************\n\n");
-		fclose(logfile);
+		// FILE *logfile = fopen(filename, "a");
+		// fprintf(stdout,"Temperature %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		// fprintf(logfile,"Temperature %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		// fprintf(logfile, "\n***********************************\n\n");
+		// fclose(logfile);
 		break;
 	}
 	case SOCK_LIGHT_RCV_ID:
 	{
-		FILE *logfile = fopen(filename, "a");
-		fprintf(stdout, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(stdout, "\n***********************************\n\n");
-		fprintf(logfile, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(logfile, "\n***********************************\n\n");
-		fclose(logfile);
+		// FILE *logfile = fopen(filename, "a");
+		// fprintf(stdout, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		// fprintf(stdout, "\n***********************************\n\n");
+		// fprintf(logfile, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		// fprintf(logfile, "\n***********************************\n\n");
+		// fclose(logfile);
 		break;
 	}
 
@@ -287,12 +293,13 @@ int main()
 	{
 		socket_request();
 		float data;
-		if(recv(client_fd, (void *)&data, sizeof(rcv_data), 0)<0)
+		struct sock_send a;
+		if(recv(client_fd, (void *)&a, sizeof(struct sock_send), 0)<0)
 		//if (read(client_fd, (void *)&data, sizeof(rcv_data)) < 0)
 		{
 			perror("Read failed\n\n");
 		}
-		//log_data(rcv_data);
+		log_data(a);
 		fprintf(stdout,"Data rcvd %f\n\n",data);
 		//if(read(client_fd, (void *)&rcv_data, sizeof(rcv_data)) < 0)
 		// {

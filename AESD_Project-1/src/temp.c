@@ -52,6 +52,7 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
 
 /**
  * @brief Can be used to read any temperature register
+ * Thigh, Tlow and Temperature
  * 
  * @param reg 
  * @return err_t 
@@ -67,9 +68,7 @@ uint16_t read_temp_reg(uint8_t reg)
     {
         error_log("ERROR: read(); in read_temp_reg() function", ERROR_DEBUG, P2);
     }
-    printf("DATA : %x", data[0]|data[1]);
-    final = data[0] & 0xFF00;
-    final = final | data[1];
+    final = (data[0] << 4) | (data[1] >> 4);
     write_pointer(TEMP_REG);
     return final;
 }
@@ -82,38 +81,38 @@ uint16_t read_temp_reg(uint8_t reg)
 uint16_t read_config()
 {
     int rc;
-    uint8_t data; 
+    uint16_t data;
     write_pointer(CONFIG_REG);
-    rc = read(i2c_open, &data, 1);
+    rc = read(i2c_open, &data, 2);
     printf("No of bytes read %d\n\n", rc);
-    printf("READ MSB %x", data);
     // printf("READ LSB %x", data[1]);
     return data;
 }
 
-err_t shutdown_mode(void)
+err_t shutdown_mode(uint8_t onoff)
 {
 
     int rc;
-    read_temp_reg(CONFIG_REG);
-    write_pointer(CONFIG_REG);
-    read_buff[1] = read_buff[1] | 0x01;
-    char buff[3] = {CONFIG_REG, read_buff[1], read_buff[0]};
-    if ((rc = write(i2c_open, buff, 3)) != 3)
-    {
-        error_log("ERROR: write(); in shutdown_mode() function", ERROR_DEBUG, P2);
-    }
+    uint16_t config = read_config();
+    config |= (uint16_t)(onoff << SHUTDOWN_MASK);
+    write_config(config);
     printf("RC: %d\n", rc);
-    read_temp_reg(CONFIG_REG);
     write_pointer(TEMP_REG);
     return 0;
 }
 
+uint8_t read_resolution(void)
+{
+    uint16_t config = read_config();
+    uint8_t data = config >> 8;
+    data = data & 0x60; // masking with R1,R2 bit
+    return data; 
+}
 err_t write_config(uint16_t data)
 {
     int temp, rc;
     uint8_t buff[3];
-    temp = (uint8_t)data >> 8;
+    temp = data >> 8;
     buff[0] = CONFIG_REG;
     buff[1] = temp;
     buff[2] = (uint8_t)data;
@@ -123,7 +122,7 @@ err_t write_config(uint16_t data)
         error_log("ERROR: write(); in write_config function", ERROR_DEBUG, P2);
         perror("In write config");
     }
-    printf("Written %x", buff[1]|buff[2]);
+    printf("Written %x", buff[1] | buff[2]);
 }
 
 /**
@@ -137,22 +136,82 @@ err_t write_tlow(uint16_t data)
 {
     int rc;
     int temp;
-    temp = data & 0x00FF;
-    data = data & 0xFF00;
-    read_temp_reg(TLOW_REG);
-    read_buff[1] = temp;
-    read_buff[0] = data;
+    data = data / 0.0625;
     write_pointer(TLOW_REG);
-    uint8_t buff[3] = {TLOW_REG, read_buff[1], read_buff[0]};
+    read_buff[1] = data >> 4;
+    read_buff[2] = data << 4;
+    uint8_t buff[3] = {TLOW_REG, read_buff[1], read_buff[2]};
     if ((rc = write(i2c_open, &buff, 3)) != 3)
     {
-        error_log("ERROR: write(); in write_tlow() function", ERROR_DEBUG, P2);
+        error_log("ERROR: write(); in write_thigh() function", ERROR_DEBUG, P2);
     }
     write_pointer(TEMP_REG);
 }
 
+uint16_t set_fault_bits(uint8_t data)
+{
+    int rc;
+    int buff[3];
+    uint16_t config = read_config();
+    config = config | (data << FAULT_MASK);
+    write_config(config);
+    write_pointer(TEMP_REG);
+}
+
+uint8_t read_fault_bits(void)
+{
+    uint16_t config = read_config();
+    uint8_t data = config >> 3;
+    return data;
+}
+
+uint8_t read_extended(void)
+{
+    int rc;
+    int data;
+    uint16_t config = read_config();
+    data = (config >> 8) & 0x10;
+    data = data >> 4;
+    return data;
+}
+
+
+
+void set_extended(uint8_t onoff)
+{
+    int rc;
+    uint8_t temp;
+    uint16_t config = read_config();
+    if(onoff == 1)
+    {
+        config |= 0x1000;
+    }
+    else
+    {
+        config |= 0x0000;
+    }
+}
+
+
+uint8_t read_conversion(void)
+{
+    int rc;
+    int data;
+    uint16_t config = read_config();
+    data = config >> 14;
+    return data;
+}
+
+void set_conversion(uint8_t data)
+{
+    uint16_t config = read_config();
+    data = data << CONVERSION;
+    config |= data;
+    write_config(config);
+}
+
 /**
- * @brief Wrte to thigh register
+ * @brief Write to thigh register
  *inside the sensor.
  * @param data 
  * @return err_t 
@@ -161,13 +220,11 @@ err_t write_thigh(uint16_t data)
 {
     int rc;
     int temp;
-    temp = data & 0x00FF;
-    data = data & 0xFF00;
-    read_temp_reg(THIGH_REG);
-    read_buff[1] = temp;
-    read_buff[0] = data;
+    data = data / 0.0625;
     write_pointer(THIGH_REG);
-    uint8_t buff[3] = {THIGH_REG, read_buff[1], read_buff[0]};
+    read_buff[1] = data >> 4;
+    read_buff[2] = data << 4;
+    uint8_t buff[3] = {THIGH_REG, read_buff[1], read_buff[2]};
     if ((rc = write(i2c_open, &buff, 3)) != 3)
     {
         error_log("ERROR: write(); in write_thigh() function", ERROR_DEBUG, P2);
@@ -184,12 +241,10 @@ err_t write_thigh(uint16_t data)
 err_t write_pointer(uint8_t reg)
 {
     int rc;
-
     if (ioctl(i2c_open, I2C_SLAVE, TEMP_ADDR) < 0)
     {
         error_log("ERROR: ioctl(); in write_pointer() function", ERROR_DEBUG, P2);
     }
-
     if ((rc = write(i2c_open, &reg, 1)) != 1)
     {
         error_log("ERROR: write(); in write_pointer() function", ERROR_DEBUG, P2);

@@ -9,6 +9,11 @@
  */
 #include "sockets.h"
 
+struct sock_send
+{
+    uint8_t id;
+    float data;
+};
 
 /**
  * @Initializes socket and opens port 3124 
@@ -67,9 +72,13 @@ void socket_listen()
 
 void socket_send(sensor_struct data_send)
 {
+    struct sock_send a; 
     if(data_send.id == 5)
     {
-        send(ser, (void *)&data_send.sensor_data.temp_data.temp_c, sizeof(sensor_struct), 0);
+        a.id = 5;
+        a.data = data_send.sensor_data.temp_data.temp_c;
+        //send(ser, (void *)&data_send.sensor_data.temp_data.temp_c, sizeof(sensor_struct), 0);
+        send(ser, (void *)&a, sizeof(struct sock_send), 0);
     }
     if(data_send.id == 6)
     {
@@ -120,7 +129,7 @@ void handle_socket_req()
         socket_flag |= L;
         break;
     case 104:
-        socket_flag |= TCL;
+        socket_flag |= STATE;
         break;
     case 105:
         socket_flag |= TFL;

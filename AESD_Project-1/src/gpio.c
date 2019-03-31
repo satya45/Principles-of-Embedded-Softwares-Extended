@@ -105,7 +105,6 @@ uint8_t gpio_poll()
         lseek(pfd[0].fd, 0, SEEK_SET);
         read(pfd[0].fd, val, 5);
         printf("Interrupt occured %s\n\n", val);
-        gpio_ctrl(GPIO53, GPIO53_V, 1);
         return 0;
     }
     else
