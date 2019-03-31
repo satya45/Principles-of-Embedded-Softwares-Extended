@@ -27,7 +27,7 @@ Referred from:- http://www.it.uom.gr/teaching/distrubutedSite/dsIdaLiu/labs/lab2
 
 int len;
 struct sockaddr_in client_addr;
-char *serv_host = "10.0.0.133";
+char *serv_host = "128.138.189.126";
 struct hostent *hptr;
 int buff_size = 0;
 int client_fd, client_f, clilen, port;

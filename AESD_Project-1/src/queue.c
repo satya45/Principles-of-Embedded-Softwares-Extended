@@ -31,25 +31,25 @@ int queue_init(void)
 	heartbeat_mq = mq_open(HEARTBEAT_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (heartbeat_mq == -1)
 	{
-		error_log("ERROR: mq_open() for heartbeat queue; in queue_init() function");
+		error_log("ERROR: mq_open() for heartbeat queue; in queue_init() function", ERROR_DEBUG, P2);
 	}
 
 	log_mq = mq_open(LOG_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (log_mq == -1)
 	{
-		error_log("ERROR: mq_open() for logger queue; in queue_init() function");
+		error_log("ERROR: mq_open() for logger queue; in queue_init() function", ERROR_DEBUG, P2);
 	}
 
 	sock_mq = mq_open(SOCK_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (sock_mq == -1)
 	{
-		error_log("ERROR: mq_open() for socket queue; in queue_init() function");
+		error_log("ERROR: mq_open() for socket queue; in queue_init() function", ERROR_DEBUG, P2);
 	}
 
 	log_sock_mq = mq_open(LOG_SOCK_QUEUE, O_RDWR | O_CREAT, 0644, &attr);
 	if (log_sock_mq == -1)
 	{
-		error_log("ERROR: mq_open() for log_sock queue; in queue_init() function");
+		error_log("ERROR: mq_open() for log_sock queue; in queue_init() function", ERROR_DEBUG, P2);
 	}
 	return OK;
 }
@@ -64,16 +64,16 @@ int queue_init(void)
  *	
  * @param loglevel - This specifies the log level.
  */
-void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel)
+void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel, uint8_t prio)
 {
 	if (loglevel & g_ll)
 	{
 		ssize_t res;
-		res = mq_send(mq, (char *)&data_send, sizeof(sensor_struct), 0);
+		res = mq_send(mq, (char *)&data_send, sizeof(sensor_struct), prio);
 		if (res == -1)
 		{
 			//How to identify error due to which queue???? think!!!!!
-			error_log("ERROR: mq_send(); in queue_send() function");
+			error_log("ERROR: mq_send(); in queue_send() function", ERROR_DEBUG, P2);
 		}
 	}
 }
@@ -90,7 +90,7 @@ sensor_struct queue_receive(mqd_t mq)
 	res = mq_receive(mq, (char *)&data_rcv, sizeof(sensor_struct), NULL);
 	if (res == -1)
 	{
-		error_log("ERROR: mq_receive(); in queue_receive() function");
+		error_log("ERROR: mq_receive(); in queue_receive() function", ERROR_DEBUG, P2);
 	}
 	return data_rcv;
 }
@@ -104,19 +104,19 @@ err_t queues_close(void)
 {
 	if (mq_close(heartbeat_mq))
 	{
-		error_log("ERROR: mq_close(heartbeat); in queues_close() function");
+		error_log("ERROR: mq_close(heartbeat); in queues_close() function", ERROR_DEBUG, P2);
 	}
 	if (mq_close(log_mq))
 	{
-		error_log("ERROR: mq_close(logger); in queues_close() function");
+		error_log("ERROR: mq_close(logger); in queues_close() function", ERROR_DEBUG, P2);
 	}
 	if (mq_close(sock_mq))
 	{
-		error_log("ERROR: mq_close(socket); in queues_close() function");
+		error_log("ERROR: mq_close(socket); in queues_close() function", ERROR_DEBUG, P2);
 	}
 	if (mq_close(log_sock_mq))
 	{
-		error_log("ERROR: mq_close(logger_socket); in queues_close() function");
+		error_log("ERROR: mq_close(logger_socket); in queues_close() function", ERROR_DEBUG, P2);
 	}
 	return OK;
 }
@@ -130,21 +130,21 @@ err_t queues_unlink(void)
 {
 	if (mq_unlink(HEARTBEAT_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(heartbeat); in queues_unlink() function");
+		error_log("ERROR: mq_unlink(heartbeat); in queues_unlink() function", ERROR_DEBUG, P2);
 	}
 
 	if (mq_unlink(LOG_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(logger); in queues_unlink() function");
+		error_log("ERROR: mq_unlink(logger); in queues_unlink() function", ERROR_DEBUG, P2);
 	}
 
 	if (mq_unlink(SOCK_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(socket); in queues_unlink() function");
+		error_log("ERROR: mq_unlink(socket); in queues_unlink() function", ERROR_DEBUG, P2);
 	}
 
 	if (mq_unlink(LOG_SOCK_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(logger_socket); in queues_unlink() function");
+		error_log("ERROR: mq_unlink(logger_socket); in queues_unlink() function", ERROR_DEBUG, P2);
 	}
 }

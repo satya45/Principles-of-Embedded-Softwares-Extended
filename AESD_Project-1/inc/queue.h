@@ -33,7 +33,7 @@ mqd_t log_sock_mq;
 
 //Function declarations
 int queue_init(void);
-void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel);
+void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel, uint8_t prio);
 sensor_struct queue_receive(mqd_t mq);
 err_t queues_close(void);
 err_t queues_unlink(void);

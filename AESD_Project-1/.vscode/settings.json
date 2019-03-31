@@ -7,6 +7,7 @@
         "main.h": "c",
         "temp.h": "c",
         "gpio.h": "c",
-        "sockets.h": "c"
+        "sockets.h": "c",
+        "logger.h": "c"
     }
 }

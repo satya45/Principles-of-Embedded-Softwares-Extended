@@ -32,7 +32,14 @@ err_t timer_init(uint8_t timer_handle)
         sev_temp.sigev_notify = SIGEV_THREAD;
         sev_temp.sigev_notify_function = &timer_handler;
         sev_temp.sigev_value.sival_int = timer_handle;
-        timer_create(CLOCK_REALTIME, &sev_temp, &timeout_temp);
+        if (timer_create(CLOCK_REALTIME, &sev_temp, &timeout_temp))
+        {
+            error_log("ERROR: timer_create(temp); in timer_init() function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Temperature Timer initialized.\n", DEBUG, P0);
+        }
 
         //Setting the first timer interval and the repeating timer interval
         trigger_temp.it_value.tv_sec = TEMP_INTERVAL_SEC;
@@ -40,7 +47,14 @@ err_t timer_init(uint8_t timer_handle)
         trigger_temp.it_value.tv_nsec = TEMP_INTERVAL_NSEC;
         trigger_temp.it_interval.tv_nsec = TEMP_INTERVAL_NSEC;
 
-        timer_settime(timeout_temp, 0, &trigger_temp, NULL);
+        if (timer_settime(timeout_temp, 0, &trigger_temp, NULL))
+        {
+            error_log("ERROR: timer_settime(temp); in timer_init function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Temperature Timer started.\n", DEBUG, P0);
+        }
     }
     else if (timer_handle == TIMER_LIGHT)
     {
@@ -52,7 +66,14 @@ err_t timer_init(uint8_t timer_handle)
         sev_light.sigev_notify = SIGEV_THREAD;
         sev_light.sigev_notify_function = &timer_handler;
         sev_light.sigev_value.sival_int = timer_handle;
-        timer_create(CLOCK_REALTIME, &sev_light, &timeout_light);
+        if (timer_create(CLOCK_REALTIME, &sev_light, &timeout_light))
+        {
+            error_log("ERROR: timer_create(light); in timer_init() function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Light Timer initialized.\n", DEBUG, P0);
+        }
 
         //Setting the first timer interval and the repeating timer interval
         trigger_light.it_value.tv_sec = LIGHT_INTERVAL_SEC;
@@ -60,7 +81,14 @@ err_t timer_init(uint8_t timer_handle)
         trigger_light.it_value.tv_nsec = LIGHT_INTERVAL_NSEC;
         trigger_light.it_interval.tv_nsec = LIGHT_INTERVAL_NSEC;
 
-        timer_settime(timeout_light, 0, &trigger_light, NULL);
+        if (timer_settime(timeout_light, 0, &trigger_light, NULL))
+        {
+            error_log("ERROR: timer_settime(light); in timer_init function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Light Timer started.\n", DEBUG, P0);
+        }
     }
     else if (timer_handle == TIMER_HB)
     {
@@ -72,7 +100,14 @@ err_t timer_init(uint8_t timer_handle)
         sev_hb.sigev_notify = SIGEV_THREAD;
         sev_hb.sigev_notify_function = &timer_handler;
         sev_hb.sigev_value.sival_int = timer_handle;
-        timer_create(CLOCK_REALTIME, &sev_hb, &timeout_hb);
+        if (timer_create(CLOCK_REALTIME, &sev_hb, &timeout_hb))
+        {
+            error_log("ERROR: timer_create(hb); in timer_init() function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Heartbeat Timer initialized.\n", DEBUG, P0);
+        }
 
         //Setting the first timer interval and the repeating timer interval
         trigger_hb.it_value.tv_sec = HB_INTERVAL_SEC;
@@ -80,7 +115,14 @@ err_t timer_init(uint8_t timer_handle)
         trigger_hb.it_value.tv_nsec = HB_INTERVAL_NSEC;
         trigger_hb.it_interval.tv_nsec = HB_INTERVAL_NSEC;
 
-        timer_settime(timeout_hb, 0, &trigger_hb, NULL);
+        if (timer_settime(timeout_hb, 0, &trigger_hb, NULL))
+        {
+            error_log("ERROR: timer_settime(hb); in timer_init function", ERROR_DEBUG, P2);
+        }
+        else
+        {
+            msg_log("Heartbeat Timer started.\n", DEBUG, P0);
+        }
     }
     return OK;
 }
@@ -98,7 +140,7 @@ void timer_handler(union sigval sv)
         temp_timerflag = 1;
         //timer_event |= TEMP_EVENT;
         //pthread_mutex_unlock(&mutex_a);
-        //printf("In Timer Handler: Temperature Sensor Timer fired.\n");
+        msg_log("In Timer Handler: Temperature Sensor Timer fired.\n", DEBUG, P0);
     }
     else if (sv.sival_int == TIMER_LIGHT)
     {
@@ -106,12 +148,12 @@ void timer_handler(union sigval sv)
         light_timerflag = 1;
         //timer_event |= LIGHT_EVENT;
         //pthread_mutex_unlock(&mutex_a);
-        //printf("In Timer Handler: Light Sensor Timer fired.\n");
+       msg_log("In Timer Handler: Light Sensor Timer fired.\n", DEBUG, P0);
     }
     else if (sv.sival_int == TIMER_HB)
     {
         hb_send(CLEAR_HB);
-        printf("In Timer Handler: Heartbeat Timer fired.\n");
+        msg_log("In Timer Handler: Heartbeat Timer fired.\n", DEBUG, P0);
     }
 }
 
@@ -124,17 +166,17 @@ err_t timer_del(void)
 {
     if (timer_delete(timeout_temp))
     {
-        error_log("ERROR: timer_delete(temp); in timer_del() function");
+        error_log("ERROR: timer_delete(temp); in timer_del() function", ERROR_DEBUG, P2);
     }
 
     if (timer_delete(timeout_light))
     {
-        error_log("ERROR: timer_delete(light); in timer_del() function");
+        error_log("ERROR: timer_delete(light); in timer_del() function", ERROR_DEBUG, P2);
     }
 
     if (timer_delete(timeout_hb))
     {
-        error_log("ERROR: timer_delete(hb); in timer_del() function");
+        error_log("ERROR: timer_delete(hb); in timer_del() function", ERROR_DEBUG, P2);
     }
 
     return OK;

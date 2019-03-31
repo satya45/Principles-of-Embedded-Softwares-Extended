@@ -17,6 +17,8 @@
 #include "queue.h"
 
 
+#define UNIT ((TEMP_UNIT == 0)? "Celsius": (TEMP_UNIT == 1)? "Kelvin": (TEMP_UNIT == 2)? "Fahrenheit": "")
+
 //Function Declarations
 void log_data(sensor_struct data_rcv);
 

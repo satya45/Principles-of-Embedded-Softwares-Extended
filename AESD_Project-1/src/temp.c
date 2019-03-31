@@ -29,7 +29,7 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
 
     if (read(i2c_open, temp_buff, 2) != 2)
     {
-        error_log("ERROR: read(); in read_temp_data");
+        error_log("ERROR: read(); in read_temp_data() function", ERROR_DEBUG, P2);
     }
     temp_data[0] = (int)temp_buff[0]; //storing MSB
     temp_data[1] = (int)temp_buff[1]; //storing LSB
@@ -37,7 +37,7 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
     read_data.id = id;
     if (clock_gettime(CLOCK_REALTIME, &read_data.sensor_data.temp_data.data_time))
     {
-        error_log("ERROR: clock_gettime(); in read_temp_data() function");
+        error_log("ERROR: clock_gettime(); in read_temp_data() function", ERROR_DEBUG, P2);
     }
     read_data.sensor_data.temp_data.temp_c = (float)((temp_data[0] << 8 | temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
     if (temp_unit == 1)
@@ -64,7 +64,7 @@ err_t read_temp_reg(uint8_t reg)
     write_pointer(reg);
     if (read(i2c_open, read_buff, 2) != 2)
     {
-        error_log("ERROR: read(); in read_temp_reg() function");
+        error_log("ERROR: read(); in read_temp_reg() function", ERROR_DEBUG, P2);
     }
     printf("Data Read from %d register: %x\n", reg, (int)(read_buff[0] | read_buff[1]));
     write_pointer(TEMP_REG);
@@ -86,7 +86,7 @@ err_t shutdown_mode(void)
     char buff[3] = {CONFIG_REG, read_buff[1], read_buff[0]};
     if ((rc = write(i2c_open, buff, 3)) != 3)
     {
-        error_log("ERROR: write(); in shutdown_mode() function");
+        error_log("ERROR: write(); in shutdown_mode() function", ERROR_DEBUG, P2);
     }
     printf("RC: %d\n", rc);
     read_temp_reg(CONFIG_REG);
@@ -114,7 +114,7 @@ err_t write_tlow(uint16_t data)
     char buff[3] = {TLOW_REG, read_buff[1], read_buff[0]};
     if ((rc = write(i2c_open, &buff, 3)) != 3)
     {
-        error_log("ERROR: write(); in write_tlow() function");
+        error_log("ERROR: write(); in write_tlow() function", ERROR_DEBUG, P2);
     }
     write_pointer(TEMP_REG);
 }
@@ -138,7 +138,7 @@ err_t write_thigh(uint16_t data)
     char buff[3] = {THIGH_REG, read_buff[1], read_buff[0]};
     if ((rc = write(i2c_open, &buff, 3)) != 3)
     {
-        error_log("ERROR: write(); in write_thigh() function");
+        error_log("ERROR: write(); in write_thigh() function", ERROR_DEBUG, P2);
     }
     write_pointer(TEMP_REG);
 }
@@ -157,12 +157,12 @@ err_t write_pointer(uint8_t reg)
 
     if (ioctl(i2c_open, I2C_SLAVE, TEMP_ADDR) < 0)
     {
-        error_log("ERROR: ioctl(); in write_pointer() function");
+        error_log("ERROR: ioctl(); in write_pointer() function", ERROR_DEBUG, P2);
     }
 
     if ((rc = write(i2c_open, &buff[reg], 1)) != 1)
     {
-        error_log("ERROR: write(); in write_pointer() function");
+        error_log("ERROR: write(); in write_pointer() function", ERROR_DEBUG, P2);
     }
     return 0;
 }

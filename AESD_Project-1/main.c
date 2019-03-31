@@ -82,35 +82,41 @@ int main(int argc, char *argv[])
 	light_timerflag = 0;
 	main_exit = 0;
 
-	gpio_init(LED1);
 	srand(time(NULL));
+	gpio_init(LED1);
+	gpio_init(LED2);
+	gpio_init(LED3);
+	gpio_init(LED4);
 	sig_init();
 	queue_init();
 	i2c_init();
 	mutex_init();
+	printf("Before light id\n");
 
 	if (remove(filename))
 	{
-		error_log("ERROR: remove(); cannot delete log file");
+		error_log("ERROR: remove(); cannot delete log file", ERROR_DEBUG, P2);
 	}
 
 	create_threads(filename);
 
 	timer_init(TIMER_HB);
 
+	msg_log("Reached main while loop.\n", DEBUG, P0);
+
 	while (!main_exit)
 	{
 		hb_handle(hb_receive());
 	}
+
+	msg_log("Exiting Main while loop.\n", DEBUG, P0);
+	msg_log("Destroying all initialized elements.\n", DEBUG, P0);
 
 	destroy_all();
 
 	for (int i = 0; i < 4; i++)
 	{
 		pthread_join(my_thread[i], NULL);
-		//{
-		// 	error_log("ERROR: pthread_join(); cannot join thread");
-		// }
 	}
 
 	return OK;
@@ -127,24 +133,26 @@ int main(int argc, char *argv[])
  */
 void *temp_thread(void *filename)
 {
-	msg_log("In Temperature Thread.\n", DEBUG);
+	msg_log("Entered Temperature Thread.\n", DEBUG, P0);
 	timer_init(TIMER_TEMP);
-	sensor_struct data_send;
+	//sensor_struct data_send;
 
 	while (1)
 	{
+		usleep(1);
 		if (temp_timerflag)
 		{
 			pthread_mutex_lock(&mutex_b);
-			//printf("In main loop: Temperature Timer event handled.\n");
+
 			//Insert Mutex lock here
 			temp_timerflag = 0;
-			queue_send(log_mq, read_temp_data(TEMP_UNIT, TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(log_mq, read_temp_data(TEMP_UNIT, TEMP_RCV_ID), INFO_DEBUG, P0);
 
 			// data_send.id = SOCK_RCV_ID;
 			// data_send.sensor_data.temp_data.temp_c = rand();
-			//queue_send(log_mq, data_send, INFO_DEBUG);
+			//queue_send(log_mq, data_send, INFO_DEBUG, P0);
 
+			msg_log("Temperature Timer event handled.\n", DEBUG, P0);
 			//Insert mutex Unlock here
 			pthread_mutex_unlock(&mutex_b);
 			hb_send(TEMP_HB);
@@ -153,28 +161,30 @@ void *temp_thread(void *filename)
 		pthread_mutex_lock(&mutex_b);
 		if (socket_flag & TC)
 		{
-			printf("Socket Flag TC set\n");
-			// queue_send(log_mq, data_send, INFO_DEBUG);
-			// queue_send(sock_mq, data_send, INFO_DEBUG);
-			queue_send(log_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-
+			// queue_send(log_mq, data_send, INFO_DEBUG, P0);
+			// queue_send(sock_mq, data_send, INFO_DEBUG, P0);
+			queue_send(log_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			queue_send(sock_mq, read_temp_data(0, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			msg_log("Temp in celsius socket request event handled", DEBUG, P0);
 			socket_flag &= (~TC);
-		}
-		else if (socket_flag & TF)
-		{
-			socket_flag &= (~TF);
-			queue_send(log_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG);
 		}
 		else if (socket_flag & TK)
 		{
 			//queue_send(log_mq, data_send, INFO_DEBUG);
 			//queue_send(sock_mq, data_send, INFO_DEBUG);
 			socket_flag &= (~TK);
-			queue_send(log_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG);
+			queue_send(log_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			queue_send(sock_mq, read_temp_data(1, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			msg_log("Temp in kelvin socket request event handled", DEBUG, P0);
 		}
+		else if (socket_flag & TF)
+		{
+			socket_flag &= (~TF);
+			queue_send(log_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			queue_send(sock_mq, read_temp_data(2, SOCK_TEMP_RCV_ID), INFO_DEBUG, P0);
+			msg_log("Temp in fahrenheit socket request event handled", DEBUG, P0);
+		}
+
 		pthread_mutex_unlock(&mutex_b);
 	}
 }
@@ -189,26 +199,38 @@ void *temp_thread(void *filename)
  */
 void *light_thread(void *filename)
 {
-	msg_log("In light Thread.\n", DEBUG);
-
+	msg_log("Entered Light Thread.\n", DEBUG, P0);
 	timer_init(TIMER_LIGHT);
-	sensor_struct data_send;
+	interrupt();
+	//sensor_struct data_send;
 	uint16_t ch0, ch1;
 	read_light_data(LIGHT_RCV_ID);
+	write_int_th(0x60,1);
+	uint16_t th = read_int_th(1);
+	printf("Threshold read %x\n", th);
+	write_int_ctrl(0x00);
+	write_int_ctrl(0x11);
+	read_light_reg(INT_CTRL);
+
 	while (1)
 	{
-
+		int rcv = gpio_poll();
+		if(rcv == 0)
+		{
+			write_command(0x40);
+		}
+		usleep(1);
 		if (light_timerflag)
 		{
 			ch0 = read_adc0();
-			printf("Channel 0 data %d\n", ch0);
+			printf("Channel 0 data %x\n", ch0);
 			if (ch0 > 75)
 			{
-				gpio_ctrl(GPIO53, GPIO53_V, 1);
+				gpio_ctrl(GPIO54, GPIO54_V, 1);
 			}
 			else
 			{
-				gpio_ctrl(GPIO53, GPIO53_V, 0);
+				gpio_ctrl(GPIO54, GPIO54_V, 0);
 			}
 			// 	ch1 = ADC_CH1();
 			// 	printf("Channel 0 data %d\n",ch1);
@@ -217,22 +239,23 @@ void *light_thread(void *filename)
 			//printf("In main loop: Light timer event handled.\n");
 			//Insert Mutex lock here
 			light_timerflag = 0;
-			queue_send(log_mq, read_light_data(LIGHT_RCV_ID), INFO_DEBUG);
+			queue_send(log_mq, read_light_data(LIGHT_RCV_ID), INFO_DEBUG, P0);
 
 			// data_send.id = LIGHT_RCV_ID;
 			// data_send.sensor_data.light_data.light = rand() % 10;
-			//queue_send(log_mq, data_send, INFO_DEBUG);
+			//queue_send(log_mq, data_send, INFO_DEBUG, P0);
 
+			msg_log("Light Timer event handled.\n", DEBUG, P0);
 			//Insert mutex Unlock here
 			pthread_mutex_unlock(&mutex_b);
 			hb_send(LIGHT_HB);
 		}
 		if (socket_flag & L)
 		{
-			printf("Socket Flag TC set\n");
-			queue_send(log_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG);
-			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG);
 			socket_flag &= (~L);
+			queue_send(log_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
+			queue_send(sock_mq, read_light_data(SOCK_LIGHT_RCV_ID), INFO_DEBUG, P0);
+			msg_log("Light socket request event handled", DEBUG, P0);
 		}
 	}
 }
@@ -247,10 +270,12 @@ void *light_thread(void *filename)
  */
 void *logger_thread(void *filename)
 {
-	msg_log("In logger Thread.\n", DEBUG);
+	msg_log("Entered Logger Thread.\n", DEBUG, P0);
 	while (1)
 	{
+		usleep(1);
 		log_data(queue_receive(log_mq));
+
 		hb_send(LOGGER_HB);
 	}
 }
@@ -265,10 +290,11 @@ void *logger_thread(void *filename)
  */
 void *sock_thread(void *filename)
 {
-	msg_log("In socket Thread.\n", DEBUG);
+	msg_log("Entered Socket Thread.\n", DEBUG, P0);
 	socket_init();
 	while (1)
 	{
+		usleep(1);
 		socket_listen();
 		handle_socket_req();
 		//pthread_mutex_lock(&mutex_b);
@@ -292,7 +318,7 @@ err_t create_threads(char *filename)
 					   (void *)0))			   // parameters to pass in
 	{
 
-		error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
+		error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created", ERROR_DEBUG, P2);
 		//Send Termination Signal
 	}
 
@@ -302,7 +328,7 @@ err_t create_threads(char *filename)
 					   (void *)0))			   // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, light_thread not created");
+		error_log("ERROR: pthread_create(); in create_threads function, light_thread not created", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_create(&my_thread[2],		   // pointer to thread descriptor
@@ -311,7 +337,7 @@ err_t create_threads(char *filename)
 					   (void *)filename))	  // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, logger_thread not created");
+		error_log("ERROR: pthread_create(); in create_threads function, logger_thread not created", ERROR_DEBUG, P2);
 	}
 	if (pthread_create(&my_thread[3],		   // pointer to thread descriptor
 					   (void *)&my_attributes, // use default attributes
@@ -319,7 +345,7 @@ err_t create_threads(char *filename)
 					   (void *)filename))	  // parameters to pass in
 
 	{
-		error_log("ERROR: pthread_create(); in create_threads function, sock_thread not created");
+		error_log("ERROR: pthread_create(); in create_threads function, sock_thread not created", ERROR_DEBUG, P2);
 	}
 
 	return OK;
@@ -334,7 +360,7 @@ err_t i2c_init(void)
 {
 	if ((i2c_open = open(I2C_BUS, O_RDWR)) < 0)
 	{
-		error_log("ERROR: i2c_open(); in i2c_init() function");
+		error_log("ERROR: i2c_open(); in i2c_init() function", ERROR_DEBUG, P2);
 	}
 }
 
@@ -347,17 +373,17 @@ err_t mutex_init(void)
 {
 	if (pthread_mutex_init(&mutex_a, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_a); mutex_a not created");
+		error_log("ERROR: pthread_mutex_init(mutex_a); mutex_a not created", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_mutex_init(&mutex_b, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_b); mutex_b not created");
+		error_log("ERROR: pthread_mutex_init(mutex_b); mutex_b not created", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_mutex_init(&mutex_error, NULL))
 	{
-		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created");
+		error_log("ERROR: pthread_mutex_init(mutex_error); mutex_error not created", ERROR_DEBUG, P2);
 	}
 
 	return OK;
@@ -376,7 +402,7 @@ sensor_struct read_error(char *error_str)
 
 	if (clock_gettime(CLOCK_REALTIME, &read_data.sensor_data.temp_data.data_time))
 	{
-		error_log("ERROR: clock_gettime(); in read_temp_data() function");
+		error_log("ERROR: clock_gettime(); in read_temp_data() function", ERROR_DEBUG, P2);
 	}
 
 	//Errno is thread safe , no mutex required.
@@ -422,9 +448,9 @@ sensor_struct read_msg(char *msg_str)
  * 
  * @param error_str - The error string that needs to be printed in the textfile.
  */
-void error_log(char *error_str)
+void error_log(char *error_str, uint8_t loglevel, uint8_t prio)
 {
-	queue_send(log_mq, read_error(error_str), INFO_DEBUG);
+	queue_send(log_mq, read_error(error_str), loglevel, prio);
 }
 
 /**
@@ -434,9 +460,9 @@ void error_log(char *error_str)
  * @param str - The message string that needs to be printed in the textfile.
  * @param loglevel - The loglevel of the message.
  */
-void msg_log(char *str, uint8_t loglevel)
+void msg_log(char *str, uint8_t loglevel, uint8_t prio)
 {
-	queue_send(log_mq, read_msg(str), loglevel);
+	queue_send(log_mq, read_msg(str), loglevel, prio);
 }
 
 /**
@@ -456,7 +482,7 @@ void hb_send(uint8_t hb_value)
 	if (res == -1)
 	{
 		//How to identify error due to which queue???? think!!!!!
-		error_log("ERROR: mq_send(); in queue_send() function");
+		error_log("ERROR: mq_send(); in queue_send() function", ERROR_DEBUG, P2);
 	}
 }
 
@@ -472,7 +498,7 @@ uint8_t hb_receive(void)
 	res = mq_receive(heartbeat_mq, (char *)&hb_rcv, sizeof(sensor_struct), NULL);
 	if (res == -1)
 	{
-		error_log("ERROR: mq_receive(); in queue_receive() function");
+		error_log("ERROR: mq_receive(); in queue_receive() function", ERROR_DEBUG, P2);
 	}
 	return hb_rcv;
 }
@@ -490,21 +516,21 @@ void hb_handle(uint8_t hb_rcv)
 	case TEMP_HB:
 	{
 		temp_hb_value++;
-		printf("temp hb received %d.\n", temp_hb_value);
+		msg_log("Temperaure Heartbeat received.\n", DEBUG, P0);
 		break;
 	}
 
 	case LIGHT_HB:
 	{
 		light_hb_value++;
-		printf("light hb received %d.\n", light_hb_value);
+		msg_log("Light Heartbeat received.\n", DEBUG, P0);
 		break;
 	}
 
 	case LOGGER_HB:
 	{
 		logger_hb_value++;
-		printf("Logger hb received %d.\n", logger_hb_value);
+		//msg_log("Logger Heartbeat received.\n", DEBUG, P0);
 		break;
 	}
 
@@ -514,7 +540,11 @@ void hb_handle(uint8_t hb_rcv)
 		{
 			if (pthread_cancel(my_thread[0]))
 			{
-				error_log("ERROR: pthread_cancel(0); in hb_handle() function");
+				error_log("ERROR: pthread_cancel(0); in hb_handle() function", ERROR_DEBUG, P2);
+			}
+			else
+			{
+				msg_log("Stopping temperature thread.\n", DEBUG, P0);
 			}
 
 			if (pthread_create(&my_thread[0],		   // pointer to thread descriptor
@@ -522,9 +552,13 @@ void hb_handle(uint8_t hb_rcv)
 							   temp_thread,			   // thread function entry point
 							   (void *)0))			   // parameters to pass in
 			{
-				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
-				//Send Termination Signal
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created", ERROR_DEBUG, P2);
 			}
+			else
+			{
+				msg_log("Resetting temperature thread.\n", DEBUG, P0);
+			}
+
 			//handle if heartbeats not received
 		}
 		else
@@ -536,16 +570,23 @@ void hb_handle(uint8_t hb_rcv)
 		{
 			if (pthread_cancel(my_thread[1]))
 			{
-				error_log("ERROR: pthread_cancel(1); in hb_handle() function");
+				error_log("ERROR: pthread_cancel(1); in hb_handle() function", ERROR_DEBUG, P2);
+			}
+			else
+			{
+				msg_log("Stopping light thread.\n", DEBUG, P0);
 			}
 
 			if (pthread_create(&my_thread[1],		   // pointer to thread descriptor
 							   (void *)&my_attributes, // use default attributes
-							   light_thread,			   // thread function entry point
+							   light_thread,		   // thread function entry point
 							   (void *)0))			   // parameters to pass in
 			{
-				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
-				//Send Termination Signal
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created", ERROR_DEBUG, P2);
+			}
+			else
+			{
+				msg_log("Resetting light thread.\n", DEBUG, P0);
 			}
 			//handle if heartbeats not received
 		}
@@ -558,16 +599,23 @@ void hb_handle(uint8_t hb_rcv)
 		{
 			if (pthread_cancel(my_thread[2]))
 			{
-				error_log("ERROR: pthread_cancel(2); in hb_handle() function");
+				error_log("ERROR: pthread_cancel(2); in hb_handle() function", ERROR_DEBUG, P2);
+			}
+			else
+			{
+				msg_log("Stopping logger thread.\n", DEBUG, P0);
 			}
 
 			if (pthread_create(&my_thread[2],		   // pointer to thread descriptor
 							   (void *)&my_attributes, // use default attributes
-							   logger_thread,			   // thread function entry point
+							   logger_thread,		   // thread function entry point
 							   (void *)0))			   // parameters to pass in
 			{
-				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created");
-				//Send Termination Signal
+				error_log("ERROR: pthread_create(); in create_threads function, temp_thread not created", ERROR_DEBUG, P2);
+			}
+			else
+			{
+				msg_log("Resetting logger thread.\n", DEBUG, P0);
 			}
 			//handle if heartbeats not received
 		}
@@ -576,7 +624,7 @@ void hb_handle(uint8_t hb_rcv)
 			logger_hb_value = 0;
 		}
 
-		printf("All hb values cleared:\ntemp=%d \nlight=%d \nlogger=%d.\n", temp_hb_value, light_hb_value, logger_hb_value);
+		msg_log("Clearing all heartbeat values.\n", DEBUG, P0);
 		break;
 	}
 	}
@@ -591,7 +639,7 @@ err_t i2c_close(void)
 {
 	if (close(i2c_open))
 	{
-		error_log("ERROR: close(); in i2c_close");
+		error_log("ERROR: close(); in i2c_close", ERROR_DEBUG, P2);
 	}
 }
 
@@ -604,17 +652,17 @@ err_t mutex_destroy(void)
 {
 	if (pthread_mutex_destroy(&mutex_a))
 	{
-		error_log("ERROR: pthread_mutex_destroy(mutex_a); cannot destroy mutex_a");
+		error_log("ERROR: pthread_mutex_destroy(mutex_a); cannot destroy mutex_a", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_mutex_destroy(&mutex_b))
 	{
-		error_log("ERROR: pthread_mutex_destroy(mutex_b); cannot destroy mutex_b");
+		error_log("ERROR: pthread_mutex_destroy(mutex_b); cannot destroy mutex_b", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_mutex_destroy(&mutex_error))
 	{
-		error_log("ERROR: pthread_mutex_destroy(mutex_error); cannot destroy mutex_error");
+		error_log("ERROR: pthread_mutex_destroy(mutex_error); cannot destroy mutex_error", ERROR_DEBUG, P2);
 	}
 
 	return OK;
@@ -624,37 +672,36 @@ err_t thread_destroy(void)
 {
 	if (pthread_cancel(my_thread[0]))
 	{
-		error_log("ERROR: pthread_cancel(0); in thread_destroy() function");
+		error_log("ERROR: pthread_cancel(0); in thread_destroy() function", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_cancel(my_thread[1]))
 	{
-		error_log("ERROR: pthread_cancel(1); in thread_destroy() function");
+		error_log("ERROR: pthread_cancel(1); in thread_destroy() function", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_cancel(my_thread[2]))
 	{
-		error_log("ERROR: pthread_cancel(2); in thread_destroy() function");
+		error_log("ERROR: pthread_cancel(2); in thread_destroy() function", ERROR_DEBUG, P2);
 	}
 
 	if (pthread_cancel(my_thread[3]))
 	{
-		error_log("ERROR: pthread_cancel(3); in thread_destroy() function");
+		error_log("ERROR: pthread_cancel(3); in thread_destroy() function", ERROR_DEBUG, P2);
 	}
 }
 
 err_t destroy_all(void)
 {
+	thread_destroy();
 	timer_del();
 	mutex_destroy();
 	queues_close();
 	queues_unlink();
-	printf("\nTerminating due to signal");
 	i2c_close();
 
-	//cancel logger thread after printing the above msg.
-	thread_destroy();
-
-	//The below command should come after printing terminating in the text file.
-	//exit(EXIT_SUCCESS);
+	FILE *fptr = fopen(filename, "a");
+	fprintf(fptr, "Terminating gracefully due to signal.\n");
+	printf("\nTerminating gracefully due to signal\n");
+	fclose(fptr);
 }

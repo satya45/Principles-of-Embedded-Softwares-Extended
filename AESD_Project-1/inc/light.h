@@ -22,6 +22,10 @@
 #include "main.h"
 
 
+#define LIGHT_TH (1)
+#define DARK (0)
+#define LIGHT (1)
+
 #define LIGHT_ADDR          0x39
 #define CNTRL_REG           0x00
 #define TIMING_REG          0x01
@@ -33,10 +37,10 @@
 #define ID_REG              0x0A
 #define ADC0_TH_SEL         0x00
 #define ADC1_TH_SEL         0x01
-#define ADC0_INT_TH_L       0x02
-#define ADC0_INT_TH_H       0x03
-#define ADC1_INT_TH_L       0x04
-#define ADC1_INT_TH_H       0x05
+#define INT_L_L             0x02
+#define INT_L_H             0x03
+#define INT_H_L             0x04
+#define INT_H_H             0x05
 
 #define COMMAND_MASK        0x80
 #define LOW_GAIN_MASK       0x00

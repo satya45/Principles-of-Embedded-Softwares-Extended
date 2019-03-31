@@ -25,11 +25,11 @@ err_t sig_init()
 	send_sig.sa_sigaction = &signal_handler;
 	if (sigaction(SIGINT, &send_sig, NULL))
 	{
-		error_log("ERROR: sigaction(); in sig_init() function");
+		error_log("ERROR: sigaction(); in sig_init() function", ERROR_DEBUG, P2);
 	}
 	if (sigaction(SIGPIPE, &send_sig, NULL))
 	{
-		error_log("ERROR: sigaction(); in sig_init() SIGPIPE function");
+		error_log("ERROR: sigaction(); in sig_init() SIGPIPE function", ERROR_DEBUG, P2);
 	}
 }
 

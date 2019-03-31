@@ -11,6 +11,7 @@
 
 #include "logger.h"
 
+bool previous_state;
 
 /**
  * @brief - This function logs data to the textfile depending on the id field obtained from the structure sensor_struct
@@ -28,10 +29,10 @@ void log_data(sensor_struct data_rcv)
 	{
 		FILE *logfile = fopen(filename, "a");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		fprintf(stdout, "In logger thread temperature Value: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		fprintf(logfile, "In logger Thread temperature Value: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
 		fprintf(logfile, "\n***********************************\n\n");
 		fclose(logfile);
 		break;
@@ -42,9 +43,17 @@ void log_data(sensor_struct data_rcv)
 		FILE *logfile = fopen(filename, "a");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
 		fprintf(stdout, "In logger thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(stdout, "In logger thread Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
 		fprintf(logfile, "In logger Thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(logfile, "In logger thread Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
+		if(previous_state != data_rcv.sensor_data.light_data.light_state)
+		{
+			fprintf(stdout, "LIGHT STATE CHANGED FROM %s to %s\n", (previous_state)? "'LIGHT'": "'DARK'", (data_rcv.sensor_data.light_data.light_state)? "'LIGHT'":"'DARK'");
+			fprintf(logfile, "LIGHT STATE CHANGED FROM %s to %s\n", (previous_state)? "'LIGHT'": "'DARK'", (data_rcv.sensor_data.light_data.light_state)? "'LIGHT'":"'DARK'");
+			previous_state = data_rcv.sensor_data.light_data.light_state;
+		}
 		fprintf(logfile, "\n***********************************\n\n");
 		fclose(logfile);
 		break;

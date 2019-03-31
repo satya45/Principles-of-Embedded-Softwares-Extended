@@ -15,11 +15,14 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define OK (0)
 #define FAIL (1)
@@ -33,7 +36,7 @@
 //#define TEMP_EVENT	(0x01)
 //#define LIGHT_EVENT	(0X02)
 
-#define TEMP_UNIT (1) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
+#define TEMP_UNIT (2) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
 
 //Heartbeat values corresponding to different threads 
 #define TEMP_HB (1)
@@ -47,7 +50,14 @@
 #define WARNING (0x02)
 #define ERROR (0x04)
 #define DEBUG (0x08)
-#define INFO_DEBUG (0x0A)
+#define ERROR_DEBUG (0x0C)
+#define INFO_DEBUG (0x09)
+#define INFO_ERROR_DEBUG (0x0E)
+
+//Prioirty levels
+#define P0		(0)
+#define P1		(1)
+#define P2		(2)
 
 //#define BACKUP_FILENAME			("backup")
 
@@ -63,6 +73,7 @@ volatile uint8_t light_timerflag;
 uint8_t g_ll;
 uint8_t main_exit;
 volatile uint8_t socket_flag;
+int gpio_fd[2]; //2, one for light and other for the temperature
 
 //char *backup = BACKUP_FILENAME;
 
@@ -82,7 +93,6 @@ struct temp_struct
 {
 	float temp_c;
 	struct timespec data_time;
-	uint8_t logger_level;
 };
 
 //Light sensor structure
@@ -90,7 +100,7 @@ struct light_struct
 {
 	float light;
 	struct timespec data_time;
-	uint8_t logger_level;
+	bool light_state;
 };
 
 //Error structure
@@ -130,8 +140,8 @@ void *sock_thread(void *filename);
 err_t i2c_init(void);
 sensor_struct read_error(char *error_str);
 sensor_struct read_msg(char *msg_str);
-void error_log(char *error_str);
-void msg_log(char *msg_str, uint8_t loglevel);
+void error_log(char *error_str, uint8_t loglevel, uint8_t prio);
+void msg_log(char *msg_str, uint8_t loglevel, uint8_t prio);
 void hb_send(uint8_t hb_value);
 uint8_t hb_receive(void);
 void hb_handle(uint8_t hb_rcv);

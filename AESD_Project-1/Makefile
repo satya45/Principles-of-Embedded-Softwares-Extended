@@ -1,4 +1,4 @@
-PLATFORM=HOST
+PLATFORM=BBG
 vpath %.c src/
 TARGET= project1
 INCLUDES_COMMON= -I inc/

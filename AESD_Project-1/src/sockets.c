@@ -20,7 +20,7 @@ void socket_init(void)
     char string[40];
     if ((serv = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        error_log("ERROR: socket() initialization");
+        error_log("ERROR: socket() initialization; in socket_init()", ERROR_DEBUG, P2);
     }
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
@@ -28,11 +28,11 @@ void socket_init(void)
     serv_addr.sin_port = htons(port);
     if (setsockopt(serv, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
     {
-        error_log("ERROR: setsockopt() in socket_init function");
+        error_log("ERROR: setsockopt() in socket_init() function", ERROR_DEBUG, P2);
     }
     if (bind(serv, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        error_log("ERROR: bind() failed in socket_init function");
+        error_log("ERROR: bind() failed in socket_init() function", ERROR_DEBUG, P2);
     }
 }
 
@@ -45,14 +45,19 @@ void socket_listen()
 {
     if (listen(serv, 5) == -1)
     {
-        error_log("ERROR: listen() in sockekt_init");
+        error_log("ERROR: listen(); in sockekt_init() function", ERROR_DEBUG, P2);
     }
     client_len = sizeof(client_addr);
     if ((ser = accept(serv, (struct sockaddr *)&client_addr, &client_len)) == -1)
     {
-        error_log("ERROR: accept() in socket_init");
+        error_log("ERROR: accept() in socket_init() function", ERROR_DEBUG, P2);
     }
-    printf("Connected\n");
+    else
+    {
+        msg_log("Connected to remote Host\n", INFO_DEBUG, P0);
+    }
+    
+    
 }
 /**
  * @brief Send data via socket  depending on light and temperature id's.
