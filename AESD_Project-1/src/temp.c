@@ -20,7 +20,7 @@
  */
 sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
 {
-    int temp;
+    uint16_t temp;
     char temp_buff[2];
     int temp_data[2];
     sensor_struct read_data;
@@ -38,7 +38,18 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
     {
         error_log("ERROR: clock_gettime(); in read_temp_data() function", ERROR_DEBUG, P2);
     }
-    read_data.sensor_data.temp_data.temp_c = (float)((temp_data[0] << 8 | temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
+    temp = ((((uint16_t)temp_data[0]) << 4) | (temp_data[1] >> 4)) & 0x0FFF;
+    float final_temp;
+    if (temp_data[0] & 0x80)
+    {
+        final_temp = ((~temp)+1) * 0.0625;
+    }
+    else
+    {
+        final_temp = 0.0625 * temp;
+    }
+    read_data.sensor_data.temp_data.temp_c = final_temp;
+    //read_data.sensor_data.temp_data.temp_c = (float)((temp_data[0] << 8 | temp_data[1]) >> 4) * 0.0625; //referred calculations from http://bildr.org/2011/01/tmp102-arduino/
     if (temp_unit == 1)
     {
         read_data.sensor_data.temp_data.temp_c = read_data.sensor_data.temp_data.temp_c + 273; //Kelvin Computations

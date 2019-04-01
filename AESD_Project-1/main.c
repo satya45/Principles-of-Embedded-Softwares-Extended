@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		gpio_ctrl(GPIO53, GPIO53_V, 1);
-		exit(EXIT_FAILURE);
+	//	exit(EXIT_FAILURE);
 	}
 
 	/*BIST for light sensor*/
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		gpio_ctrl(GPIO53, GPIO53_V, 1);
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
 
 	//Initializing Mutexes
