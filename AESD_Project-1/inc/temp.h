@@ -42,7 +42,6 @@
 uint8_t read_buff[3];
 
 //Function Declarations
-//err_t i2c_init(void);
 uint16_t read_temp_reg(uint8_t);
 sensor_struct read_temp_data(uint8_t temp_unit, uint8_t);
 err_t write_pointer(uint8_t);

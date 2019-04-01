@@ -22,7 +22,7 @@
 #define HB_INTERVAL_SEC (10)
 #define HB_INTERVAL_NSEC (0)
 
-
+//Timer Handle declarations
 timer_t timeout_temp;
 timer_t timeout_light;
 timer_t timeout_hb;

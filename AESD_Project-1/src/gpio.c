@@ -12,6 +12,13 @@
  */
 #include "gpio.h"
 
+
+/**
+ * @brief Initialize GPIO pins 
+ * export its directory in the system.
+ * @param pin 
+ * @return err_t 
+ */
 err_t gpio_init(uint8_t pin)
 {
     FILE *fptr;
@@ -29,6 +36,17 @@ err_t gpio_init(uint8_t pin)
     return OK;
 }
 
+
+/**
+ * @brief Control gpio pins value ON & OFF
+ * Pass direction as first parameter
+ * Pass value path as second paramter
+ * Send 1, 0 as third parameter.
+ * @param directory 
+ * @param value 
+ * @param onoff 
+ * @return err_t 
+ */
 err_t gpio_ctrl(char *directory, char *value, uint8_t onoff)
 {
     FILE *fptr;
@@ -54,7 +72,17 @@ err_t gpio_ctrl(char *directory, char *value, uint8_t onoff)
     {
         error_log("ERROR: fcloses(value); in gpio_ctrl() function", ERROR_DEBUG, P2);
     }
+    return OK;
 }
+
+/**
+ * @brief Can be used to set edge 
+ * rising and falling.
+ * 
+ * @param directory 
+ * @param level 
+ * @return err_t 
+ */
 
 err_t gpio_edge(char *directory, char *level)
 {
@@ -69,9 +97,17 @@ err_t gpio_edge(char *directory, char *level)
     if (fclose(fptr) != 0)
     {
         error_log("ERROR: fclose(directory); in gpio_ctrl() function", ERROR_DEBUG, P2);
-    }    
+    }  
+    return OK;  
 }
 
+/**
+ * @brief Set the direction of gpio 
+ * in or out.
+ * @param directory 
+ * @param direction 
+ * @return err_t 
+ */
 err_t gpio_dir(char *directory, char *direction)
 {
     FILE *fptr;
@@ -86,7 +122,14 @@ err_t gpio_dir(char *directory, char *direction)
     {
         error_log("ERROR: fclose(directory); in gpio_ctrl() function", ERROR_DEBUG, P2);
     }    
+    return OK;
 }
+
+/**
+ * @brief Used to poll the gpio pin
+ * 
+ * @return uint8_t 
+ */
 
 uint8_t gpio_poll()
 {
@@ -111,9 +154,14 @@ uint8_t gpio_poll()
     {
         gpio_ctrl(GPIO54, GPIO54_V, 0);   
     }
-    
+    return OK;
 }
 
+/**
+ * @brief Initialize gpio pin 60
+ * 
+ * @return err_t 
+ */
 err_t interrupt(void)
 {
     gpio_init(60);
@@ -124,7 +172,5 @@ err_t interrupt(void)
     {
         error_log("ERROR: open(gpio_fd[1]); in interrupt() function", ERROR_DEBUG, P2);
     }
-    //gpio_fd[2] = open("/sys/class/gpio/gpio60/value", O_RDONLY);
-
-    
+    return OK;    
 }

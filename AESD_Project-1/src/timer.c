@@ -136,19 +136,13 @@ void timer_handler(union sigval sv)
 {
     if (sv.sival_int == TIMER_TEMP)
     {
-        //pthread_mutex_lock(&mutex_a);
         temp_timerflag = 1;
-        //timer_event |= TEMP_EVENT;
-        //pthread_mutex_unlock(&mutex_a);
         msg_log("In Timer Handler: Temperature Sensor Timer fired.\n", DEBUG, P0);
     }
     else if (sv.sival_int == TIMER_LIGHT)
     {
-        //pthread_mutex_lock(&mutex_a);
         light_timerflag = 1;
-        //timer_event |= LIGHT_EVENT;
-        //pthread_mutex_unlock(&mutex_a);
-       msg_log("In Timer Handler: Light Sensor Timer fired.\n", DEBUG, P0);
+        msg_log("In Timer Handler: Light Sensor Timer fired.\n", DEBUG, P0);
     }
     else if (sv.sival_int == TIMER_HB)
     {
@@ -166,17 +160,17 @@ err_t timer_del(void)
 {
     if (timer_delete(timeout_temp))
     {
-        error_log("ERROR: timer_delete(temp); in timer_del() function", ERROR_DEBUG, P2);
+        perror("ERROR: timer_delete(temp); in timer_del() function");
     }
 
     if (timer_delete(timeout_light))
     {
-        error_log("ERROR: timer_delete(light); in timer_del() function", ERROR_DEBUG, P2);
+        perror("ERROR: timer_delete(light); in timer_del() function");
     }
 
     if (timer_delete(timeout_hb))
     {
-        error_log("ERROR: timer_delete(hb); in timer_del() function", ERROR_DEBUG, P2);
+        perror("ERROR: timer_delete(hb); in timer_del() function");
     }
 
     return OK;

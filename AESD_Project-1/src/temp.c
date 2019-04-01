@@ -14,8 +14,8 @@
 /**
  * @brief Read Temperature
  * 
- * @param temp_unit 
- * @param id 
+ * @param temp_unit - Specify 0, 1, 2 to change the unit.
+ * @param id - Enter Id for the logger
  * @return sensor_struct 
  */
 sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
@@ -54,8 +54,8 @@ sensor_struct read_temp_data(uint8_t temp_unit, uint8_t id)
  * @brief Can be used to read any temperature register
  * Thigh, Tlow and Temperature
  * 
- * @param reg 
- * @return err_t 
+ * @param reg - Pass address of the register which is required to be read.
+ * @return uint16_t 
  */
 
 uint16_t read_temp_reg(uint8_t reg)
@@ -73,9 +73,9 @@ uint16_t read_temp_reg(uint8_t reg)
     return final;
 }
 /**
- * @brief Set Shutdown mode
+ * @brief Used to read config register
  * 
- * @return err_t 
+ * @return uint16_t 
  */
 
 uint16_t read_config()
@@ -88,6 +88,12 @@ uint16_t read_config()
     // printf("READ LSB %x", data[1]);
     return data;
 }
+/**
+ * @brief Set or clear the shutdown mode
+ * 
+ * @param onoff 
+ * @return err_t 
+ */
 
 err_t shutdown_mode(uint8_t onoff)
 {
@@ -101,6 +107,11 @@ err_t shutdown_mode(uint8_t onoff)
     return 0;
 }
 
+/**
+ * @brief Read resolution bits
+ * 
+ * @return uint8_t 
+ */
 uint8_t read_resolution(void)
 {
     uint16_t config = read_config();
@@ -108,6 +119,13 @@ uint8_t read_resolution(void)
     data = data & 0x60; // masking with R1,R2 bit
     return data; 
 }
+
+/**
+ * @brief Write to the config register
+ * 
+ * @param data - Specify the data which is to be written to cnfig register
+ * @return err_t 
+ */
 err_t write_config(uint16_t data)
 {
     int temp, rc;
@@ -148,6 +166,14 @@ err_t write_tlow(uint16_t data)
     write_pointer(TEMP_REG);
 }
 
+
+/**
+ * @brief Set the fault bits
+ * 
+ * @param data - Pass data which is written to the fault bits
+ * @return uint16_t 
+ */
+
 uint16_t set_fault_bits(uint8_t data)
 {
     int rc;
@@ -158,12 +184,24 @@ uint16_t set_fault_bits(uint8_t data)
     write_pointer(TEMP_REG);
 }
 
+/**
+ * @brief Read the fault bits
+ * 
+ * @return uint8_t 
+ */
+
 uint8_t read_fault_bits(void)
 {
     uint16_t config = read_config();
     uint8_t data = config >> 3;
     return data;
 }
+
+/**
+ * @brief Read extended bits.
+ * 
+ * @return uint8_t 
+ */
 
 uint8_t read_extended(void)
 {
@@ -175,7 +213,11 @@ uint8_t read_extended(void)
     return data;
 }
 
-
+/**
+ * @brief Set the extended bit to 1 or 0
+ * 
+ * @param onoff - Pass 1 to set and 0 to reset
+ */
 
 void set_extended(uint8_t onoff)
 {
@@ -192,7 +234,11 @@ void set_extended(uint8_t onoff)
     }
 }
 
-
+/**
+ * @brief Read conversion bits from the config register
+ * 
+ * @return uint8_t 
+ */
 uint8_t read_conversion(void)
 {
     int rc;
@@ -201,6 +247,12 @@ uint8_t read_conversion(void)
     data = config >> 14;
     return data;
 }
+
+/**
+ * @brief Set the conversion bits in the config register
+ * 
+ * @param data - Pass the data to set/reset the conversion bits
+ */
 
 void set_conversion(uint8_t data)
 {
@@ -213,7 +265,7 @@ void set_conversion(uint8_t data)
 /**
  * @brief Write to thigh register
  *inside the sensor.
- * @param data 
+ * @param data - Pass the data to be written to the thigh register
  * @return err_t 
  */
 err_t write_thigh(uint16_t data)
@@ -235,7 +287,7 @@ err_t write_thigh(uint16_t data)
 /**
  * @brief Write to pointer register avaialable inside the sensor.
  * 
- * @param reg 
+ * @param reg - Pass the register address
  * @return err_t 
  */
 err_t write_pointer(uint8_t reg)

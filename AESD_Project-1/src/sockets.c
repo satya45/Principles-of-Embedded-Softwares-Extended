@@ -9,12 +9,6 @@
  */
 #include "sockets.h"
 
-struct sock_send
-{
-    uint8_t id;
-    float data;
-};
-
 /**
  * @Initializes socket and opens port 3124 
  */
@@ -41,7 +35,6 @@ void socket_init(void)
     }
 }
 
-
 /**
  * @brief Used to listen on port again
  * 
@@ -61,8 +54,6 @@ void socket_listen()
     {
         msg_log("Connected to remote Host\n", INFO_DEBUG, P0);
     }
-    
-    
 }
 /**
  * @brief Send data via socket  depending on light and temperature id's.
@@ -72,17 +63,13 @@ void socket_listen()
 
 void socket_send(sensor_struct data_send)
 {
-    struct sock_send a; 
-    if(data_send.id == 5)
+    if (data_send.id == 5)
     {
-        a.id = 5;
-        a.data = data_send.sensor_data.temp_data.temp_c;
-        //send(ser, (void *)&data_send.sensor_data.temp_data.temp_c, sizeof(sensor_struct), 0);
-        send(ser, (void *)&a, sizeof(struct sock_send), 0);
+        send(ser, (void *)&data_send.sensor_data.temp_data.temp_c, sizeof(float), 0);
     }
-    if(data_send.id == 6)
+    if (data_send.id == 6)
     {
-        send(ser, (void *)&data_send.sensor_data.light_data.light, sizeof(sensor_struct), 0);
+        send(ser, (void *)&data_send.sensor_data.light_data.light, sizeof(float), 0);
     }
 }
 
@@ -101,9 +88,6 @@ int socket_recv(void)
     {
         return 0;
     }
-    printf("Receieved %d bytes\n\n", len);
-    printf("Received String %d\n", data);
-    fflush(stdout);
     return data;
 }
 /**
@@ -117,28 +101,44 @@ void handle_socket_req()
     switch (socket_recv())
     {
     case 100:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= TC;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 101:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= TF;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 102:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= TK;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 103:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= L;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 104:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= STATE;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 105:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= TFL;
+        pthread_mutex_unlock(&mutex_a);
         break;
     case 106:
+        pthread_mutex_lock(&mutex_a);
         socket_flag |= TKL;
+        pthread_mutex_unlock(&mutex_a);
         break;
     default:
+        pthread_mutex_lock(&mutex_a);
         socket_flag = 0;
+        pthread_mutex_unlock(&mutex_a);
         break;
     }
 }

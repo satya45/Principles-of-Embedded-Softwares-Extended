@@ -27,15 +27,13 @@
 #define OK (0)
 #define FAIL (1)
 #define I2C_BUS ("/dev/i2c-2")
+/*Uncomment to use I2C kernel driver and comment the previous line*/
 //#define I2C_BUS ("/dev/myi2c_char")
 
 //Timer initialization macros
 #define TIMER_TEMP (1)
 #define TIMER_LIGHT (2)
 #define TIMER_HB (3)
-
-//#define TEMP_EVENT	(0x01)
-//#define LIGHT_EVENT	(0X02)
 
 #define TEMP_UNIT (0) //Set 0 for degree celsius, 1 for kelvin, 2 for fahrenheit.
 
@@ -60,8 +58,7 @@
 #define P1		(1)
 #define P2		(2)
 
-//#define BACKUP_FILENAME			("backup")
-
+//Mutex declarations
 pthread_mutex_t mutex_a;
 pthread_mutex_t mutex_b;
 pthread_mutex_t mutex_error;
@@ -76,7 +73,9 @@ uint8_t main_exit;
 volatile uint8_t socket_flag;
 int gpio_fd[2]; //2, one for light and other for the temperature
 
-//char *backup = BACKUP_FILENAME;
+// Error number
+typedef uint32_t err_t;
+
 
 //Macros for different events.
 #define TEMP_RCV_ID (1)
@@ -86,8 +85,6 @@ int gpio_fd[2]; //2, one for light and other for the temperature
 #define SOCK_TEMP_RCV_ID (5)
 #define SOCK_LIGHT_RCV_ID (6)
 
-// Error number
-typedef uint32_t err_t;
 
 //Temperature sensor structure
 struct temp_struct

@@ -33,6 +33,7 @@
 #define TFL         0x14
 #define TKL         0x18     
 
+//Variable Declarations
 int serv, ser, client_len, port;
 struct sockaddr_in serv_addr, client_addr;
 struct hostent *hptr;

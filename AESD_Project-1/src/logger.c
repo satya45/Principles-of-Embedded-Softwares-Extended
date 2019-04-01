@@ -29,10 +29,10 @@ void log_data(sensor_struct data_rcv)
 	{
 		FILE *logfile = fopen(filename, "a");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread temperature Value: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
+		fprintf(stdout, "Temperature Value Recorded: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread temperature Value: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
+		fprintf(logfile, "Temperature Value Recorded: %f %s.\n", data_rcv.sensor_data.temp_data.temp_c, UNIT);
 		fprintf(logfile, "\n***********************************\n\n");
 		fclose(logfile);
 		break;
@@ -42,12 +42,12 @@ void log_data(sensor_struct data_rcv)
 	{
 		FILE *logfile = fopen(filename, "a");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(stdout, "In logger thread Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
+		fprintf(stdout, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(stdout, "Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
-		fprintf(logfile, "In logger thread Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
+		fprintf(logfile, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(logfile, "Light State: %s.\n", (data_rcv.sensor_data.light_data.light_state)? "LIGHT":"DARK");
 		if(previous_state != data_rcv.sensor_data.light_data.light_state)
 		{
 			fprintf(stdout, "LIGHT STATE CHANGED FROM %s to %s\n", (previous_state)? "'LIGHT'": "'DARK'", (data_rcv.sensor_data.light_data.light_state)? "'LIGHT'":"'DARK'");
@@ -92,10 +92,10 @@ void log_data(sensor_struct data_rcv)
 		fprintf(logfile, "SOCKET REQUEST RECEIVED\n");
 		fprintf(stdout, "SOCKET REQUEST RECEIVED\n");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		fprintf(stdout, "Temperature Value Recorded: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.temp_data.data_time.tv_sec, data_rcv.sensor_data.temp_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread temperature Value: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
+		fprintf(logfile, "Temperature Value Recorded: %f.\n", data_rcv.sensor_data.temp_data.temp_c);
 		fprintf(logfile, "\n***********************************\n\n");
 		fclose(logfile);
 		pthread_mutex_unlock(&mutex_error);
@@ -108,10 +108,10 @@ void log_data(sensor_struct data_rcv)
 		fprintf(logfile, "SOCKET REQUEST RECEIVED\n");
 		fprintf(stdout, "SOCKET REQUEST RECEIVED\n");
 		fprintf(stdout, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(stdout, "In logger thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(stdout, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
 		fprintf(stdout, "\n***********************************\n\n");
 		fprintf(logfile, "Timestamp: %lu seconds and %lu nanoseconds.\n", data_rcv.sensor_data.light_data.data_time.tv_sec, data_rcv.sensor_data.light_data.data_time.tv_nsec);
-		fprintf(logfile, "In logger Thread Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
+		fprintf(logfile, "Light Value: %f.\n", data_rcv.sensor_data.light_data.light);
 		fprintf(logfile, "\n***********************************\n\n");
 		fclose(logfile);
 		break;

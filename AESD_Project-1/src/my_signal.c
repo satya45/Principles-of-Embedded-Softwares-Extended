@@ -25,6 +25,7 @@ err_t sig_init()
 	if (sigaction(SIGINT, &send_sig, NULL))
 	{
 		perror("ERROR: sigaction(); in sig_init() function");
+		/*Closing all the previous resources and freeing memory uptil failure*/
 		mq_close(heartbeat_mq);
 		mq_unlink(HEARTBEAT_QUEUE);
 		mq_close(log_mq);
@@ -37,6 +38,7 @@ err_t sig_init()
 	if (sigaction(SIGPIPE, &send_sig, NULL))
 	{
 		perror("ERROR: sigaction(); in sig_init() SIGPIPE function");
+		/*Closing all the previous resources and freeing memory uptil failure*/
 		mq_close(heartbeat_mq);
 		mq_unlink(HEARTBEAT_QUEUE);
 		mq_close(log_mq);

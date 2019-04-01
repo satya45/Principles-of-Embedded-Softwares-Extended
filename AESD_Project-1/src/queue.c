@@ -39,6 +39,7 @@ int queue_init(void)
 	if (log_mq == -1)
 	{
 		perror("Logger message queue initialization failed.\n");
+		/*Closing all the previous resources and freeing memory uptil failure*/
 		mq_close(heartbeat_mq);
 		mq_unlink(HEARTBEAT_QUEUE);
 		exit(EXIT_FAILURE);
@@ -48,6 +49,7 @@ int queue_init(void)
 	if (sock_mq == -1)
 	{
 		perror("Socket message queue initialization failed.\n");
+		/*Closing all the previous resources and freeing memory uptil failure*/
 		mq_close(heartbeat_mq);
 		mq_unlink(HEARTBEAT_QUEUE);
 		mq_close(log_mq);
@@ -76,7 +78,6 @@ void queue_send(mqd_t mq, sensor_struct data_send, uint8_t loglevel, uint8_t pri
 		res = mq_send(mq, (char *)&data_send, sizeof(sensor_struct), prio);
 		if (res == -1)
 		{
-			//How to identify error due to which queue???? think!!!!!
 			error_log("ERROR: mq_send(); in queue_send() function", ERROR_DEBUG, P2);
 		}
 	}
@@ -108,15 +109,15 @@ err_t queues_close(void)
 {
 	if (mq_close(heartbeat_mq))
 	{
-		error_log("ERROR: mq_close(heartbeat); in queues_close() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_close(heartbeat); in queues_close() function");
 	}
 	if (mq_close(log_mq))
 	{
-		error_log("ERROR: mq_close(logger); in queues_close() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_close(logger); in queues_close() function");
 	}
 	if (mq_close(sock_mq))
 	{
-		error_log("ERROR: mq_close(socket); in queues_close() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_close(socket); in queues_close() function");
 	}
 	return OK;
 }
@@ -130,16 +131,16 @@ err_t queues_unlink(void)
 {
 	if (mq_unlink(HEARTBEAT_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(heartbeat); in queues_unlink() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_unlink(heartbeat); in queues_unlink() function");
 	}
 
 	if (mq_unlink(LOG_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(logger); in queues_unlink() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_unlink(logger); in queues_unlink() function");
 	}
 
 	if (mq_unlink(SOCK_QUEUE))
 	{
-		error_log("ERROR: mq_unlink(socket); in queues_unlink() function", ERROR_DEBUG, P2);
+		perror("ERROR: mq_unlink(socket); in queues_unlink() function");
 	}
 }

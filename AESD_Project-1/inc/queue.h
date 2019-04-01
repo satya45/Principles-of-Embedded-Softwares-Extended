@@ -24,7 +24,7 @@
 #define LOG_QUEUE				("/mq2")
 #define SOCK_QUEUE				("/mq3")
 
-
+//Message Queue handles
 mqd_t heartbeat_mq;
 mqd_t log_mq;
 mqd_t sock_mq;

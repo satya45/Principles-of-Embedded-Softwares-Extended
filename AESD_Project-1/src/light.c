@@ -10,12 +10,12 @@
  */
 #include "light.h"
 
-char read_buff;
+int read_buff;
 
 /**
  * @brief read_light_data() reads lux data from the sensor.
  * Acquires the bus, sets the control register, powers up the sensor and calls lux_data() function
- * @param id 
+ * @param id - Strores the identification of event into the structure
  * @return sensor_struct 
  */
 sensor_struct read_light_data(uint8_t id)
@@ -52,7 +52,7 @@ sensor_struct read_light_data(uint8_t id)
 /**
  * @brief Read light identification register from the sensor
  * 
- * @return err_t 
+ * @return uint8_t 
  */
 uint8_t light_id(void)
 {
@@ -73,14 +73,13 @@ uint8_t light_id(void)
     {
        error_log("ERROR: read(); in light_id() function", ERROR_DEBUG, P2);
     }
-    printf("Light Id: %x\n", (int)id);
     return id;
 }
 
 /**
  * @brief Used to set the command register in the sensor
  * 
- * @param reg_addr 
+ * @param reg_addr - Pass the register address to write in the command register
  * @return err_t 
  */
 err_t write_command(uint8_t reg_addr)
@@ -90,7 +89,7 @@ err_t write_command(uint8_t reg_addr)
     {
        error_log("ERROR: write(); in write_command() function", ERROR_DEBUG, P2);
     }
-    return 0;
+    return OK;
 
 }
 /**
@@ -138,7 +137,6 @@ uint16_t read_adc0(void)
     }
     data = ADC_CH0();
     return data;
-
 }
 /**
  * @brief Read ADC channel 1 from the sensor.
@@ -201,7 +199,6 @@ float lux_data(void)
         lux_data = 0;
     }
     return lux_data;
-    //return adc0;
 }
 
 
@@ -218,14 +215,13 @@ err_t read_light_reg(uint8_t reg)
     {
        error_log("ERROR: read(); in read_light_reg() function", ERROR_DEBUG, P2);
     }
-    printf("Light reg read %x", (int)read_buff);
     return 0;
 
 }
 /**
  * @brief Writes timing register
  * 
- * @param data 
+ * @param data - Pass the data which is required to write.
  * @return err_t 
  */
 
@@ -238,7 +234,7 @@ err_t write_timing_reg(uint8_t data)
     {
        error_log("ERROR: write(); in write_timing_reg() function", ERROR_DEBUG, P2);
     }
-    return 0;
+    return OK;
 }
 
 /**
@@ -256,14 +252,14 @@ err_t write_int_ctrl(uint8_t data)
     {
       error_log("ERROR: write(); in write_int_reg() function", ERROR_DEBUG, P2);
     }
-    return 0;
+    return OK;
 
 }
 
 /**
  * @brief Can be used to read the interrupt threshold 
  * register.
- * @param reg 
+ * @param reg  - Reg specifies MSB or LSB
  * @return uint16_t 
  */
 
